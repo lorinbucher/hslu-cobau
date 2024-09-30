@@ -1,0 +1,100 @@
+{ 
+  "name"                  : "Multiplication by three",
+  "commandline"           : "${buildDir}/mul3${exec_ext}",
+  "description"           : "A set of system tests to verify, whether the multiply program works as specified",
+  "timeoutMilliseconds"   : 500,
+
+  "testCases" : [
+    {
+        "name"           : "single digit (zero)",
+        "precondition"   : [],
+        "args"           : "",
+        "input"          : "0\n",
+        "expectedOutput" : "0",
+        "maxTime"        : 500,
+        "score"          : 4
+    },
+    {
+        "name"           : "single digit (uneven)",
+        "precondition"   : [],
+        "args"           : "",
+        "input"          : "3\n",
+        "expectedOutput" : "9",
+        "maxTime"        : 500,
+        "score"          : 4
+    },
+    {
+        "name"           : "two digits (even)",
+        "precondition"   : [],
+        "args"           : "",
+        "input"          : "22\n",
+        "expectedOutput" : "66",
+        "maxTime"        : 500,
+        "score"          : 2
+    },
+    {
+        "name"           : "two digits (uneven)",
+        "precondition"   : [],
+        "args"           : "",
+        "input"          : "27\n",
+        "expectedOutput" : "81",
+        "maxTime"        : 500,
+        "score"          : 2
+    },
+    {
+      "name"           : "text",
+      "precondition"   : [],
+      "args"           : "",
+      "input"          : "42\n",
+      "expectedOutput" : "Please enter an integer value:\nThe result of value * 3 is: 126",
+      "maxTime"        : 500,
+      "score"          : 2
+    },
+    {
+        "name"           : "negative",
+        "precondition"   : [],
+        "args"           : "",
+        "input"          : "-123\n",
+        "expectedOutput" : "-369",
+        "maxTime"        : 500,
+        "score"          : 2
+    },
+
+    {
+        "name"           : "large (positive)",
+        "precondition"   : [],
+        "args"           : "",
+        "input"          : "1235\n",
+        "expectedOutput" : "3705",
+        "maxTime"        : 500,
+        "score"          : 1
+    },
+    {
+      "name"           : "large (negative)",
+      "precondition"   : [],
+      "args"           : "",
+      "input"          : "-1235\n",
+      "expectedOutput" : "-3705",
+      "maxTime"        : 500,
+      "score"          : 1
+    },
+    {
+      "name"           : "64-bit (almost maximal positive)",
+      "precondition"   : [],
+      "args"           : "",
+      "input"          : "3074457345618258602\n",
+      "expectedOutput" : "9223372036854775806",
+      "maxTime"        : 500,
+      "score"          : 1
+    },
+    {
+      "name"           : "64-bit (maximal negative)",
+      "precondition"   : [],
+      "args"           : "",
+      "input"          : "-3074457345618258602\n",
+      "expectedOutput" : "-9223372036854775806",
+      "maxTime"        : 500,
+      "score"          : 1
+    }
+  ]
+}
