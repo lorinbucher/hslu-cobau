@@ -51,6 +51,7 @@ _start:
 
     mov r8, 0                           ; initialize the input number register
     mov r9, 0                           ; initialize the input character counter register
+    mov r14, 0                          ; initialize the pos/neg switch
 
     jmp parse_input_digit               ; jump to the loop parsing the input digits
 
@@ -58,8 +59,11 @@ parse_input_digit:
     movzx rcx, byte [BUF_IN + r9]       ; load the next character from the input buffer into register rcx
     inc r9                              ; increment the input character counter
 
-;    cmp rcx, NEGATIVE_NUM               ; compare the value with the dash character
-;    je parse_input_digit                ; jump to the next character if the character is a dash
+    cmp rcx, NEGATIVE_NUM               ; compare the value with the dash character
+    je negative_switch
+    ;cmp rcx, NEGsATIVE_NUM
+    ;je parse_input_digit                ; jump to the next character if the character is a dash
+
     sub rcx, CHAR_OFFSET                ; convert the ASCII character to a numeric value
 
     cmp rcx, 0                          ; compare the numeric value with 0
@@ -73,14 +77,24 @@ parse_input_digit:
 
     jmp parse_input_digit               ; continue with the next character
 
+negative_switch:
+    mov r14, 1
+    jmp parse_input_digit
+
 multiply_by_3:
     imul rax, r8, 3                     ; multiply the input number by three and store the result into register rax
 
     mov r11, 10                         ; initialize the divisor to convert the output number
     mov r12, 0                          ; initialize the temporary buffer position counter
     mov r13, 0                          ; initialize the output buffer position counter
-
+    cmp r14, 0                          ; check if input was negative
+    jg add_neg_sign
     jmp convert_output_digit            ; jump to the loop converting the output number
+
+add_neg_sign:
+    mov byte [BUF_OUT + r13], '-'
+    inc r13
+    jmp convert_output_digit
 
 convert_output_digit:
     mov rdx, 0                          ; reset the register holding the rest to 0
