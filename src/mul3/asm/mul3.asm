@@ -51,35 +51,37 @@ _start:
 
     mov r8, 0                           ; initialize the input number register
     mov r9, 0                           ; initialize the input character counter register
-    mov r14, 0                          ; initialize the pos/neg switch
+    mov r10, 0                          ; initialize the sign flag (0 = pos, 1 = neg)
 
+    movzx rcx, byte [BUF_IN]            ; load the first character from the input buffer into the register rcx
+    cmp rcx, NEGATIVE_NUM               ; check if the input number is negative
+    jne parse_input_digit               ; continue without setting the sign flag to negative
+
+    inc r9                              ; increment the input character counter
+    mov r10, 1                          ; change the sign flag to be negative
     jmp parse_input_digit               ; jump to the loop parsing the input digits
 
 parse_input_digit:
-    movzx rcx, byte [BUF_IN + r9]       ; load the next character from the input buffer into register rcx
+    movzx rcx, byte [BUF_IN + r9]       ; load the next character from the input buffer into the register rcx
     inc r9                              ; increment the input character counter
-
-    cmp rcx, NEGATIVE_NUM               ; compare the value with the dash character
-    je negative_switch
-    ;cmp rcx, NEGATIVE_NUM
-    ;je parse_input_digit                ; jump to the next character if the character is a dash
-
     sub rcx, CHAR_OFFSET                ; convert the ASCII character to a numeric value
 
     cmp rcx, 0                          ; compare the numeric value with 0
-    jl multiply_by_3                    ; exit the parsing of the input if the character is not a number
-
+    jl check_negative_input             ; exit the parsing of the input if the character is not a number
     cmp rcx, 9                          ; compare the numeric value with 9
-    jg multiply_by_3                    ; exit the parsing of the input if the character is not a number
+    jg check_negative_input             ; exit the parsing of the input if the character is not a number
 
     imul r8, 10                         ; multiply the current input number by 10
     add r8, rcx                         ; add the numeric value to the input number
 
     jmp parse_input_digit               ; continue with the next character
 
-negative_switch:
-    mov r14, 1
-    jmp parse_input_digit
+check_negative_input:
+    cmp r10, 0                          ; check if the input is positive
+    je multiply_by_3                    ; jump with a positive input number
+
+    neg r8                              ; change the input number to a negative number
+    jmp multiply_by_3                   ; jump with a negative input number
 
 multiply_by_3:
     imul rax, r8, 3                     ; multiply the input number by three and store the result into register rax
@@ -87,14 +89,18 @@ multiply_by_3:
     mov r11, 10                         ; initialize the divisor to convert the output number
     mov r12, 0                          ; initialize the temporary buffer position counter
     mov r13, 0                          ; initialize the output buffer position counter
-    cmp r14, 0                          ; check if input was negative
-    jg add_neg_sign
-    jmp convert_output_digit            ; jump to the loop converting the output number
 
-add_neg_sign:
-    mov byte [BUF_OUT + r13], NEGATIVE_NUM
-    inc r13
-    jmp convert_output_digit
+    jmp check_negative_output           ; jump to check if the result is a negative number
+
+check_negative_output:
+    cmp rax, 0                          ; check if the result is a negative number
+    jge convert_output_digit            ; jump with a positive output number
+
+    mov byte [BUF_OUT], NEGATIVE_NUM    ; load the negative sign character into the output buffer
+    inc r13                             ; increment the position in the output buffer
+
+    neg rax                             ; change the result to a positive number for the output digit conversion
+    jmp convert_output_digit            ; jump with a negative output number
 
 convert_output_digit:
     mov rdx, 0                          ; reset the register holding the rest to 0
