@@ -61,7 +61,7 @@ parse_input_digit:
 
     cmp rcx, NEGATIVE_NUM               ; compare the value with the dash character
     je negative_switch
-    ;cmp rcx, NEGsATIVE_NUM
+    ;cmp rcx, NEGATIVE_NUM
     ;je parse_input_digit                ; jump to the next character if the character is a dash
 
     sub rcx, CHAR_OFFSET                ; convert the ASCII character to a numeric value
@@ -92,7 +92,7 @@ multiply_by_3:
     jmp convert_output_digit            ; jump to the loop converting the output number
 
 add_neg_sign:
-    mov byte [BUF_OUT + r13], '-'
+    mov byte [BUF_OUT + r13], NEGATIVE_NUM
     inc r13
     jmp convert_output_digit
 
