@@ -4,167 +4,125 @@ DEFAULT REL		; defines relative addresses are used; is a NASM command
 extern _read
 extern _write
 extern _exit
+
 ; export entry point
 global _start
-    LENGTH EQU 64   ; definition constant LENGTH (buffer length), max length of an int
-    char_offset EQU 48  ; ASCII char offset
-    Section .data
-        WELCOME: db 'Please enter an integer value:', 13, 10	; defines the string constant
-                                        ; don’t add CR (10) in Linux
-        WEL_LEN: EQU $-WELCOME		        ; Reads the length of WELCOME ino WEL_LN
 
-        OUTPUT: db 'The result of value * 3 is: '	; defines the string constant
-                                        ; don’t add CR (10) in Linux
-        OUT_LEN: EQU $-OUTPUT		        ; Reads the length of OUTPUT ino OUT_LN
+LENGTH equ 64           ; definition of the buffer length
+CHAR_OFFSET equ '0'     ; definition of the offset to convert between ASCII and digits
+NEGATIVE_NUM equ '-'    ; definition of the ASCII character for negative numbers
 
-        ERROR: db 'Please enter an INTEGER value!', 13, 10	; defines the string constant
-                                              ; don’t add CR (10) in Linux
-        ERR_LEN: EQU $-ERROR		        ; Reads the length
+; defines the start the section of string constants
+section .data
+    alignb 8                                            ; align to 8 bytes (for 64-bit machine)
 
-section .bss		; defines start of section of uninitialized data
-    align 8            ; align to 8 bytes (for 64-bit machine)
-    BUFFER resb LENGTH  ; buffer (64 bytes)
-    BUF2 resb LENGTH
+    CRLF:       db  13, 10                              ; defines the string for a new line (CRLF)
+    CRLF_LEN:   equ $-CRLF                              ; reads the length of the new line text into CRLF_LEN
 
-section .text	        ; defines start of code section
+    TXT_IN:     db 'Please enter an integer value: '    ; defines the string constant for the input text
+    TXT_IN_LEN: equ $-TXT_IN                            ; reads the length of the input text into TXT_IN_LEN
+
+    TXT_OUT:     db 'The result of value * 3 is: '      ; defines the string constant for the output text
+    TXT_OUT_LEN: equ $-TXT_OUT                          ; reads the length of the output text into TXT_OUT_LEN
+
+; defines the start of the section of uninitialized data
+section .bss
+    alignb 8                ; align to 8 bytes (for 64-bit machine)
+
+    BUF_IN resb LENGTH      ; input buffer (64 bytes)
+    BUF_TMP resb LENGTH     ; temporary buffer (64 bytes)
+    BUF_OUT resb LENGTH     ; output buffer (64 bytes)
+
+; defines the start of the code section
+section .text
 
 _start:
-    mov rdi, WELCOME    ; copy address of variable BUFFER into register rdi
-    mov rsi, WEL_LEN    ; register rax contains the number of typed char, copy value of rax into register rsi
-    call _write         ; now calls function _write to write to console (stdin)
-    mov r13,0
-    ; set up reading from console
-    mov rdi, BUFFER     ; copy address of variable BUFFER into register rdi
-    mov rsi, LENGTH     ; copy value of LENGTH into register rsi
-    call _read		    ; now calls function _read to read from console (stdin)
+    mov rdi, TXT_IN                     ; copy the address of the constant TXT_IN into the register rdi
+    mov rsi, TXT_IN_LEN                 ; write the length of TXT_IN into the register rsi
+    call _write                         ; writes the input text to the console (STDOUT)
 
-    mov r13, rax        ; set up r13 as a counter:
-    ;sub r13,1             ; remove end of line character
-    mov r14, 0          ; use r14 as position pointer in buffer
-    mov r10,0           ; create a 0 storage for the input int
-    ;mov r9, r13
-    mov r11, 10          ; decimal multiplier
+    mov rdi, CRLF                       ; copy the address of the constant CRLF into the register rdi
+    mov rsi, CRLF_LEN                   ; write the length of CRLF into the register rsi
+    call _write                         ; writes the new line to the console (STDOUT)
 
+    mov rdi, BUF_IN                     ; copy the address of variable BUFFER into the register rdi
+    mov rsi, LENGTH                     ; copy the length of the input buffer into the register rsi
+    call _read                          ; reads the input from the console (STDIN)
 
-    ;mov r15, BUFFER     ; copy address of variable BUFFER into register rdi
-    movzx r8, byte[BUFFER+r14]              ; use r8 as storage for in process result
-    cmp r8, 0x2d       ; check first char for being a -
-    je  negative_input
-    ; the char in r8 needs to become an int
-    sub r8, char_offset         ;
-    ;check if it is in the range of an int: ASSUMPTION if the first one is an int the others are too
-    cmp r8,0
-    jl error_exit
-    cmp r8,9
-    jg error_exit
+    mov r8, 0                           ; initialize the input number register
+    mov r9, 0                           ; initialize the input character counter register
 
-    add r14,1
-    add r10, r8
-    cmp r14, r13       ; compare the current buffer pointer to the number of elements in the buffer
-    je mul3
-positive_input:
-    movzx r8, byte[BUFFER+r14]
-    cmp r8, 10
-    je mul3
-    cmp r8,13
-    je mul3
-    sub r8, char_offset
-    imul r10, r11
-    add r10, r8
-    add r14,1
-    cmp r14, r13
-    je mul3
-    jmp positive_input
+    jmp parse_input_digit               ; jump to the loop parsing the input digits
 
-negative_input:             ; r14=0, r8=-
-    sub r13,1
-        add r14,1
-        movzx r8, byte[BUFFER+r14]
-        sub r8, char_offset
-        cmp r8,0
-        jl error_exit
-        cmp r8,9
-        jg error_exit
+parse_input_digit:
+    movzx rcx, byte [BUF_IN + r9]       ; load the next character from the input buffer into register rcx
+    inc r9                              ; increment the input character counter
 
-        sub r10, r8
-        add r14, 1
-        cmp r14, r13
-        jge mul3
-    neg_loop:
-            movzx r8, byte[BUFFER+r14]
-            imul r10, r11
-            sub r8, char_offset
-            sub r10, r8
-            add r14,1
-            cmp r14, r13
-            jl neg_loop
+;    cmp rcx, NEGATIVE_NUM               ; compare the value with the dash character
+;    je parse_input_digit                ; jump to the next character if the character is a dash
+    sub rcx, CHAR_OFFSET                ; convert the ASCII character to a numeric value
 
-mul3: ; multiply the int *3
-    imul rax, r10, 3     ; put the result in rax to use in division
-    mov r12, 0         ; division counter and length of output
-    mov rdx, 0
-    cmp rax, 0
-    jg out_pos
-    cmp rax, 0
-    jl out_neg
-    jmp finish_up ; catch 0
+    cmp rcx, 0                          ; compare the numeric value with 0
+    jl multiply_by_3                    ; exit the parsing of the input if the character is not a number
 
-out_pos:
-    cmp rax, 9
-    jle finish_up
-    jmp output_loop
+    cmp rcx, 9                          ; compare the numeric value with 9
+    jg multiply_by_3                    ; exit the parsing of the input if the character is not a number
 
-out_neg:
-    mov byte[BUF2+r12], 0x2d  ; set a - at the first position
-    inc r12
-    mov r10, 0
-    sub r10, rax
-    mov rax, r10
-    cmp rax, 9
-    jle finish_up
-    jmp output_loop
+    imul r8, 10                         ; multiply the current input number by 10
+    add r8, rcx                         ; add the numeric value to the input number
 
-output_loop:
-    mov rbx, 10
-    idiv rbx        ; divide rax by rbx
-    add rdx, char_offset         ; get the remainder of the division and turn it into a char
-    mov byte[BUF2+r12], dl
-    inc r12
-    cmp rax, 9
-    jle finish_up
-    jmp output_loop
+    jmp parse_input_digit               ; continue with the next character
 
-finish_up:
-    add rax, char_offset
-    mov byte[BUF2+r12], al
-    mov r15, r12
-    inc r15
-    mov r13, 0
+multiply_by_3:
+    imul rax, r8, 3                     ; multiply the input number by three and store the result into register rax
 
-fill_the_buffer:
-    mov al, byte[BUF2+r12],
-    mov byte[BUFFER+r13], al
-    inc r13
-    dec r12
-    cmp r13, r15
-    jl fill_the_buffer
+    mov r11, 10                         ; initialize the divisor to convert the output number
+    mov r12, 0                          ; initialize the temporary buffer position counter
+    mov r13, 0                          ; initialize the output buffer position counter
 
-write:
-    mov rdi, OUTPUT
-    mov rsi, OUT_LEN
-    call _write
-    mov rdi, BUFFER     ; copy address of variable BUFFER into register rdi
-    mov rsi, r15        ; register rax contains the number of typed char, copy value of rax into register rsi
-    call _write         ; now calls function _write to write to console (stdin)
+    jmp convert_output_digit            ; jump to the loop converting the output number
+
+convert_output_digit:
+    mov rdx, 0                          ; reset the register holding the rest to 0
+    idiv r11                            ; divide the result by 10, to get the next digit
+
+    add rdx, CHAR_OFFSET                ; convert the numeric value to an ASCII character
+    mov byte [BUF_TMP + r12], dl        ; load the digit into the temporary buffer
+    inc r12                             ; increment the position in the temporary buffer
+
+    cmp rax, 0                          ; check if the conversion is finished
+    je fill_output_buffer               ; jump to fill the output buffer
+
+    jmp convert_output_digit            ; continue with the next character
+
+fill_output_buffer:
+    dec r12                             ; decrement the position in the temporary buffer
+
+    mov al, byte [BUF_TMP + r12]        ; load the next digit from the temporary buffer
+    mov byte [BUF_OUT + r13], al        ; load the next digit into the output buffer
+    inc r13                             ; increment the position in the output buffer
+
+    cmp r12, 0                          ; check if the output buffer is filled
+    je _end                             ; jump to write the result to the console
+
+    jmp fill_output_buffer              ; continue with the next position in the output buffer
+
+_end:
+    mov rdi, TXT_OUT                    ; copy the address of the constant TXT_OUT into the register rdi
+    mov rsi, TXT_OUT_LEN                ; write the length of TXT_OUT into the register rsi
+    call _write                         ; writes the output text to the console (STDOUT)
+
+    mov rdi, BUF_OUT                    ; copy the address of the constant BUF_OUT into the register rdi
+    mov rsi, r13                        ; write the length of the output buffer into the register rsi
+    call _write                         ; writes the output text to the console (STDOUT)
+
+    mov rdi, CRLF                       ; copy the address of the constant CRLF into the register rdi
+    mov rsi, CRLF_LEN                   ; write the length of CRLF into the register rsi
+    call _write                         ; writes the new line to the console (STDOUT)
+
+    jmp exit                            ; jump to exit the program
 
 ; exit program with exit code 0
 exit:
-        mov   rdi, 0                ; first parameter: set exit code
-        call  _exit                 ; call function
-
-error_exit:
-        mov rdi, ERROR
-        mov rsi, ERR_LEN
-        call _write
-        mov   rdi, 1                ; first parameter: set exit code
-        call  _exit                 ; call function
+    mov rdi, 0                          ; first parameter: set exit code
+    call _exit                          ; call the exit function
