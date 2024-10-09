@@ -1,0 +1,1156 @@
+{
+    "name"                  : "Mini Parser",
+    "commandline"           : "${jvm} -jar ${buildDir}/libs/MiniJCompiler.jar",
+    "description"           : "A set of system tests to verify, whether the compiler is able to perform a syntactic analysis of a miniJ program",
+    "startScore"            : -30,
+    "timeoutMilliseconds"   : 3000,
+    "testCases" : [
+    {
+        "name"             : "Global: int",
+        "input"            : "number : integer;",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Global: boolean",
+        "input"            : "isSet : boolean;",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Global: text",
+        "input"            : "value : string;",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Global: zwei Variablen",
+        "input"            : "number : integer;\nzeichen : string;",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Global: drei Variablen",
+        "input"            : "number : integer;\nzeichen : string;\nisSet : boolean;",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Global: kein Symbolname",
+        "input"            : "integer;",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.65
+    },
+    {
+        "name"             : "Global: mehr als ein Symbolname",
+        "input"            : "i,j : integer;",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.65
+    },
+    {
+        "name"             : "Global: kein Semikolon",
+        "input"            : "wert : int",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.7
+    },
+    {
+        "name"             : "Funktion: keine Parameter",
+        "input"            : "fun myName() {\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Funktion: ein Parameter",
+        "input"            : "fun name(param1 : integer) {\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Funktion: zwei Parameter",
+        "input"            : "fun name(param1 : integer, p2 : integer) {\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Funktion: drei Parameter",
+        "input"            : "fun name(param1 : integer, p2 : boolean, TEXT : string) {\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Funktion: kein Name",
+        "input"            : "fun () {\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Funktion: keine Parameterliste",
+        "input"            : "fun myName {\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Funktion: keine Klammerung",
+        "input"            : "fun name(param1 : integer)",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Funktion: falsche Klammerung",
+        "input"            : "fun name(param1 : integer) {",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Funktion: falsche Klammerung",
+        "input"            : "fun name(param1 : integer)\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Funktion: falscher Parameter (1)",
+        "input"            : "fun name(int) {\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Funktion: falscher Parameter (2)",
+        "input"            : "fun name(bla)\n{\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Funktion: falsche Parameter an zweiter Stelle",
+        "input"            : "fun name(a : integer, bla) {\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Local: int",
+        "input"            : "number : integer;",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Local: bool",
+        "input"            : "fun func() {\n    isSet : boolean;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Local: text",
+        "input"            : "fun func() {\n    value : string;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Local: zwei Variablen",
+        "input"            : "fun func() {\n    number : integer;\n    zeichen : string;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Local: drei Variablen",
+        "input"            : "fun func() {\n    number : integer;\n    zeichen : string;\n    isSet : boolean;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Local: kein Symbolname",
+        "input"            : "fun func() {\n    integer;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.65
+    },
+    {
+        "name"             : "Local: mehr als ein Symbolname",
+        "input"            : "fun func() {\n     i,j : integer;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.65
+    },
+    {
+        "name"             : "Local: kein Semikolon",
+        "input"            : "fun func() {\n    wert : integer\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.7
+    },
+    {
+        "name"             : "Zuweisung: Integerkonstanten",
+        "input"            : "fun func() {\n    i : integer;\n    i = 0;\n    i = 424242;\n    i = +424242;\n    i = -424242;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Zuweisung: Stringkonstanten",
+        "input"            : "fun func() {\n    s1 : string;\n    s2 : string;\n    s1 = \"\";\n    s2 = \"Hallo Welt!\";\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Zuweisung: Booleankonstanten",
+        "input"            : "fun func() {\n    a : boolean;\n    b : boolean;\n    a = false;\n    b = true;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Zuweisung: ungültige Integerkonstante",
+        "input"            : "fun func() {\n    i : integer;\n    i = +123a;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Zuweisung: rechte Seite fehlt",
+        "input"            : "fun func() {\n    i : integer;\n    i = ;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Zuweisung: fehlerhafte Stringkonstante (1)",
+        "input"            : "fun func() {\n    s : string;\n    s = \"abc;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Zuweisung: fehlerhafte Stringkonstante (2)",
+        "input"            : "fun func() {\n    s : string;\n    s = abc\";\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Zuweisung: mittels ==",
+        "input"            : "fun func() {\n    s : string;\n    s == \"abc\";\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Funktionsaufruf: ohne Parameter",
+        "input"            : "fun funcB() { }\nfun funcA() {\n    funcB();\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Funktionsaufruf: ein Parameter",
+        "input"            : "fun funcB(a : integer) { }\nfun funcA() {\n    funcB(42);\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Funktionsaufruf: zwei Parameter",
+        "input"            : "fun funcB(a : integer, b : integer) { }\nfun funcA() {\n    funcB(13, 42);\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Funktionsaufruf: drei Parameter",
+        "input"            : "fun funcB(a : integer, b : integer, c : integer) { }\nfun funcA() {\n    funcB(13, 25, 42);\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Funktionsaufruf: keine Parameterliste ",
+        "input"            : "fun funcB() { }\nfun funcA() {\n    funcB;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Funktionsaufruf: falsche Parameterliste (1)",
+        "input"            : "fun funcB(a : integer) { }\nfun funcA() {\n    callStatement(42;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Funktionsaufruf: falsche Parameterliste (2)",
+        "input"            : "fun funcB(a : integer) { }\nfun funcA() {\n    callStatement 42);\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Funktionsaufruf: falsche Parameterliste (3)",
+        "input"            : "fun funcB(a : integer) { }\nfun funcA() {\n    callStatement(;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Funktionsaufruf: falsche Parameterliste (4)",
+        "input"            : "fun funcB(a : integer, b : integer) { }\nfun funcA() {\n    funcB(13 42);\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Return: ohne Expression",
+        "input"            : "fun func() {\n    return;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 1.0
+    },
+    {
+        "name"             : "Return: mit Konstante",
+        "input"            : "fun func() : integer {\n    return 42;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 1.0
+    },
+    {
+        "name"             : "Return: falsches Schlüsselwort",
+        "input"            : "fun func() {\n    rtrn;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 1.0
+    },
+    {
+        "name"             : "Return: falsches Schlüsselwort mit Konstante",
+        "input"            : "fun func() {\n    rtrn 42;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 1.0
+    },
+    {
+        "name"             : "Ausdruck: mathematische Operatoren (Binär)",
+        "input"            : "fun func(i : integer) {\n a : integer;\n    a = 2 + i;\n    a = 2 - 1;\n    a = 2 * 1;\n    a = i / 2;\n    a = i % 2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Ausdruck: rechter Operand fehlt (math.)",
+        "input"            : "fun func() {\n    a : integer;\n    a = 2 +\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: linker Operand fehlt (math.)",
+        "input"            : "fun func() {\n    a : integer;\n    a = * -1;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Vergleiche",
+        "input"            : "fun func(a : integer, b : integer) {\n    x : boolean;\n    x = b < a;\n    x = b > a;\n    x = b <= a;\n    x = b >= a;\n    x = b == a;\n    x = b != a;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: rechter Operand fehlt (Vergleich)",
+        "input"            : "fun func() {\n    a : integer;\n    a = 2 <;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: linker Operand fehlt (Vergleich)",
+        "input"            : "fun func() {\n    a : integer;\n    a = < -2000;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Binär (Logik)",
+        "input"            : "fun func(a : integer, b : integer) {\n    x : boolean;\n    x = b < a || b > a;\n    x = b < a && b > a;\n    x = !(b < a);\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: rechter Operand fehlt (Logik)",
+        "input"            : "fun func() {\n    a : integer;\n    a = 2 !=;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: linker Operand fehlt (Logik)",
+        "input"            : "fun func() {\n    a : integer;\n    a =  == 2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Klammern",
+        "input"            : "fun func(i : integer) {\n    a : integer;\n    a = (2 + i);\n    a = ((2 + i));\n    a = (((2 + i)));\n    a = (2 + i) + (2 - i);\n    a = ((2 + i) + (2 - i));\n    a = ((2 + i)) + ((2 - i));\n    a = (((2 + i)) + ((2 - i)));\n    a = (((2 + i))) + (((2 - i)));\n    a = -(5 + 1);\n    a = -(5 + 1) + (2 + i) + (2 - i);\n    a = -((5 + 1) + (2 + i) + (2 - i));\n    a = -((5 + 1)) + ((2 + i)) + ((2 - i));\n    a = -(((5 + 1)) + ((2 + i)) + ((2 - i)));\n    a = -(((5 + 1))) + (((2 + i))) + (((2 - i)));\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: Falsche Klammerung 1",
+        "input"            : "fun func() {\n    a : integer;\n    a = (2 + 1;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Falsche Klammerung 2",
+        "input"            : "fun func() {\n    a : integer;\n    a = (2 + 1));\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Falsche Klammerung 3",
+        "input"            : "fun func() {\n    a : integer;\n    a = ((2 + 1);\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Unär",
+        "input"            : "fun func(i : integer) {\n    a : integer;\n    b : boolean;\n    a = -a;\n    b = !b;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: Unär ohne Semikolon",
+        "input"            : "fun func(i : integer) {\n    a : integer;\n    a = -a\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Unär ohne Operator",
+        "input"            : "fun func(i : integer) {\n    b : boolean;\n    b = !;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Pre-increment und Pre-decrement",
+        "input"            : "fun func(i : integer) {\n    a : integer;\n    x : integer;\n    x = ++a;\n    x = --a;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: Post-increment und Post-decrement",
+        "input"            : "fun func(i : integer) {\n    a : integer;\n    x : integer;\n    x = a++;\n    x = a--;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: Pre-increment und Pre-decrement geben eine Speicherstelle zurück",
+        "input"            : "fun func(i : integer) {\n    a : integer;\n    x : integer;\n    x = ++++a;\n    x = ----a;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: Post-increment und Post-decrement geben einen Wert zurück",
+        "input"            : "fun func(i : integer) {\n    a : integer;\n    x : boolean;\n    x = a++++;\n    y = a----;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Increment und Decrement kombiniert mit Addition",
+        "input"            : "fun func() {\n    a : integer;\n    b : integer;\n    x : integer;\n    x = a++ + b++;\n    x = ++a + ++b;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: Increment und Decrement mit fehlendem zweiten Operanden",
+        "input"            : "fun func() {\n    a : integer;\n    b : integer;\n    x : integer;\n    x = a++ +;\n    x = b-- -;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Funktionsaufruf mit Expressions",
+        "input"            : "fun call1() { }\nfun call2(a : integer) { }\nfun call3(a : boolean, b : integer) { }\nfun call4(a : string, b : integer, c : integer) { }\nfun func(a : integer, b : integer) {\n    call1();\n    call2(a + b);\n    call3(a > b, b - a);\n    call4(\"Test\", b++, a);\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: Funktionsaufruf mit Expressions (Fehlerhaft 1)",
+        "input"            : "fun call1(a : integer) { }\nfun func(a : integer, b : integer) {\n    call1((a + b);\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Funktionsaufruf mit Expressions (Fehlerhaft 2)",
+        "input"            : "fun call1(a : integer) { }\nfun func(a : integer, b : integer) {\n    call1(a + b;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Funktionsaufruf mit Expressions (Fehlerhaft 3)",
+        "input"            : "fun call1(a : integer) { }\nfun func(a : integer, b : integer) {\n    call1((a + b), (a - b);\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Return mit Expression",
+        "input"            : "fun func() : integer {\n    a : integer;\n    return a * a;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: Return mit komplexer Expression",
+        "input"            : "fun func() : integer {\n    a : integer;\n    a = 1;\n    return ((a + a) * (a / a));\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: Return mit fehlendem Operand",
+        "input"            : "fun func() : integer {\n    a : integer;\n    return a *;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Return mit fehlender schliessender Klammer",
+        "input"            : "fun func() : integer {\n    a : integer;\n    a = 1;\n    return (;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: Funktionsaufruf (keine Parameter)",
+        "input"            : "fun funcB() : integer {\n    return 1;\n}\nfun funcA() {\n    a : integer;\n    a = funcB() * funcB();\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: Funktionsaufruf (ein Parameter)",
+        "input"            : "fun square(a : integer) : integer {\n    return a * a;\n}\nfun funcA() {\n    a : integer;\n    b : integer;\n    b = 5;\n    a = square(4 * b);\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Ausdruck: fehlende Klammer (keine Parameter)",
+        "input"            : "fun funcB() : integer {\n    return 1;\n}\nfun funcA() {\n    a : integer;\n    a = funcB() * funcB(;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "Ausdruck: falsches Komma (ein Parameter)",
+        "input"            : "fun square(a : integer) {\n    return a * a;\n}\nfun funcA() {\n    a : integer;\n    b : integer;\n    b = 5;\n    a = square(4 * b, );\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.15
+    },
+    {
+        "name"             : "If: ohne else",
+        "input"            : "fun test(i : integer) {\n    if (i == 1) {\n        return;\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "If: mit else",
+        "input"            : "fun test(i : integer) {\n    if (i == 1) {\n        return;\n    } else {\n        return;\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "If: mit else if",
+        "input"            : "fun test(i : integer) {\n    if (i == 1) {\n        return;\n    } else if (i > 1) {\n        return;\n    } else {\n        return;\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "If: fehlende schliessende Klammer (1)",
+        "input"            : "fun test(i : integer) {\n    if (i == 1) {\n        return;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.28
+    },
+    {
+        "name"             : "If: fehlende öffnende Klammer (1)",
+        "input"            : "fun test(i : integer) {\n    if (i == 1)\n        return;\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.28
+    },
+    {
+        "name"             : "If: fehlende öffnende Klammer (2) ",
+        "input"            : "fun test(i : integer) {\n    if (i == 1) {\n        return;\n    } else if (i > 1)\n        return;\n    } else\n        return;\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.28
+    },
+    {
+        "name"             : "If: fehlende schliessende Klammer (2)",
+        "input"            : "fun test(i : integer) {\n    if (i == 1) {\n        return;\n    } else if (i > 1) {\n        return;\n     else {\n        return;\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.28
+    },
+    {
+        "name"             : "If: doppelt verschachtelt",
+        "input"            : "fun test(i : integer) {\n    if (i == 1) {\n        i = i + 1;\n    } else if (i > 1) {\n        if (i < 100) {\n            i = i + 2;\n        } else {\n            i = i + 3;\n        }\n    } else {\n        if (i < -100) {\n            i = i + 4;\n        } else if(i > -50) {\n            i = i + 5;\n        }\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "If: schliessende Klammer fehlt (doppelt verschachtelt)",
+        "input"            : "fun test(i : integer) {\n    if (i == 1) {\n        i = i + 1;\n    else if (i > 1) {\n        if (i < 100) {\n            i = i + 2;\n        else\n            i = i + 3;\n        }\n    } else {\n        if (i < -100) {\n            i = i + 4;\n        else if(i > -50) {\n            i = i + 5;\n        }\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.28
+    },
+    {
+        "name"             : "If: dreifach verschachtelt",
+        "input"            : "fun test(i : integer) {\n    if (i > 0) {\n        if (i > 1) {\n            if (i > 2) {\n               i = i + 1;\n            }\n        }\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "If: Schliessende Klammer fehlt (dreifach verschachtelt)",
+        "input"            : "fun test(i : integer) {\n    if (i > 0) {\n        if (i > 1) {\n            if (i > 2) {\n               i = i + 1;\n            }\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.28
+    },
+    {
+        "name"             : "If: Klammern fehlen (dreifach verschachtelt)",
+        "input"            : "fun test(i : integer) {\n    if i > 0 {\n        if i > 1 {\n            if i > 2 {\n               i = i + 1;\n            }\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.34
+    },
+    {
+        "name"             : "While: mit Statement",
+        "input"            : "fun stmt1() { }\nfun myWhile() {\n    x : integer;\n    while(x > 1) {\n        x = x - 1;\n        stmt1();\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "While: ohne öffnende Klammer",
+        "input"            : "fun stmt1() { }\nfun myWhile()\n    x : integer;\n    while (x > 1)\n        x = x - 1;\n        stmt1();\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.66
+    },
+    {
+        "name"             : "While: ohne schliessende Klammer",
+        "input"            : "fun stmt1() { }\nfun myWhile() {\n    x : integer;\n    while (x > 1) {\n        x = x - 1;\n        stmt1();\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.66
+    },
+    {
+        "name"             : "While: ohne Semikolon",
+        "input"            : "fun stmt1() { }\nfun myWhile() {\n    x : integer;\n    while (x > 1) {\n        x = x - 1;\n        stmt1()\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.67
+    },
+    {
+        "name"             : "While: zwei Statements",
+        "input"            : "fun stmt1() { }\nfun stmt2() { }\nfun myWhile() {\n    x : integer;\n    while(x > 1) {\n        stmt1();\n        stmt2();\n        x = x - 1;\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "While: drei Statements",
+        "input"            : "fun stmt1() { }\nfun stmt2() { }\nfun stmt3() { }\nfun myWhile() {\n    x : integer;\n    while(x > 1) {\n        stmt1();\n        stmt2();\n        stmt3();\n        x = x - 1;\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "While: verschachtelt mit If",
+        "input"            : "fun stmt1() { }\nfun stmt2() { }\nfun complex(x : integer) {\n    i : integer;\n    while(x > 1) {\n        if (x > 2) {\n            stmt1();\n            i = i + 1;\n        } else if (x < 2) {\n            while (x < 10) {\n                 stmt2();\n                 i = i * (i / 2);\n            }\n        }\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Kommentar: korrekter Zeilenkommentar (1)",
+        "input"            : "// Basic comment",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Kommentar: korrekter Zeilenkommentar (2)",
+        "input"            : "fun stmt1() { }\nfun stmt2() { }\nfun myIf(x : integer) {\n    if(x > 1) {\n       // my comment\n        stmt1();\n        stmt2();\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Kommentar: korrekter Zeilenkommentar (3)",
+        "input"            : "///Basic comment",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Kommentar: Fehler im Zeilenkommentar (1)",
+        "input"            : "/Falscher Kommentar",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Kommentar: Fehler im Zeilenkommentar (2)",
+        "input"            : "fun stmt1() { }\nfun stmt2() { }\nfun myIf(x : integer) {\n    if(x > 1) {\n        stmt1();\n        /Falscher Kommentar\n        stmt2();\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Kommentar: korrekter Blockkommentar (1)",
+        "input"            : "bla1 : integer;\n/* Bla */\nbla2 : integer;",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Kommentar: korrekter Blockkommentar (2)",
+        "input"            : "fun stmt1() { }\nfun stmt2() { }\nfun myIf(x : integer) {\n    if(x > 1) {\n        stmt1();\n        /*Mein\n          mehrzeiliger\n          Kommentar\n        */\n        stmt2();\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "Kommentar: Fehler im Blockkommentar (3)",
+        "input"            : "bla : integer;\n/* Bla\nbla : integer;",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Kommentar: Fehler im Blockkommentar (3)",
+        "input"            : "fun stmt1() { }\nfun stmt2() { }\nfun myIf(x : integer) {\n    if(x > 1) {\n        stmt1();\n        /*Mein\n          mehrzeiliger\n          Kommentar\n        stmt2();\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Bezeichner: gültig",
+        "input"            : "v : integer;\nV : integer;\nvalid : integer;\nValidIdentifier : integer;\nvalid1 : integer;\nvalid1BIG : integer;\nvalid$_BIG_$ : integer;",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 2.0
+    },
+    {
+        "name"             : "Bezeichner: ungültiger Bezeichner (1)",
+        "input"            : "1bla : integer;",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Bezeichner: ungültiger Bezeichner (2)",
+        "input"            : "abc! : integer;",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Bezeichner: ungültiger Bezeichner (3)",
+        "input"            : "abc* : integer;",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Bezeichner: ungültiger Bezeichner (3)",
+        "input"            : "cab- : integer;",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Semikolon: nach Funktionsdefinition",
+        "input"            : "fun func() {\n};",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.66
+    },
+    {
+        "name"             : "Semikolon: Nach Else",
+        "input"            : "fun func(a : integer) : integer {\n   if (a > 0) {\n        return 1;\n   } else {\n        return 0;\n   };\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.67
+    },
+    {
+        "name"             : "Semikolon: Nach While",
+        "input"            : "fun func(a : integer) {\n   while (a > 10) {\n        a = a - 1;\n   };\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.67
+    },
+    {
+        "name"             : "Semikolon: Semikolon statt schliessender Klammer",
+        "input"            : "fun func() {\n;",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 2.0
+    },
+    {
+        "name"             : "Block: Verschachtelter Block",
+        "input"            : "fun func() {\n    a : integer;\n    {\n        a = 1;\n        a = a + 1;\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.33
+    },
+    {
+        "name"             : "Block: If ohne Klammerung",
+        "input"            : "fun func(a : integer) : integer {\n    if (a > 0) return 1; else return 0;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.33
+    },
+    {
+        "name"             : "Block: While ohne Klammerung",
+        "input"            : "fun func(a : integer) {\n    while (a > 0) a = a - 1;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.34
+    },
+    {
+        "name"             : "Block: Variablendeklaration in Block (nicht erlaubt)",
+        "input"            : "fun func() {\n    a : integer;\n    a = 1;\n    {\n        b : integer;\n        b = 2;\n        a = a + b;\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.33
+    },
+    {
+        "name"             : "Block: fehlende schliessende Klammer bei verschachteltem Block",
+        "input"            : "fun func() {\n    a : integer;\n    {\n        a = 1;\n        a = a + 1;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.33
+    },
+    {
+        "name"             : "Block: fehlende schliessende Klammer bei if",
+        "input"            : "fun func(a : integer) {\n    if (a > 0) { return 1; else return 0;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.33
+    },
+    {
+        "name"             : "Struct: Definition",
+        "input"            : "struct test {\n   f1 : integer;\n}\nmyStruct : test;",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: ein Feld",
+        "input"            : "struct scalar {\n  myValue : integer;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: leer",
+        "input"            : "struct leer {\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: zwei Felder",
+        "input"            : "struct meinStruct {\n  xCoord : integer;\n  yCoord : integer;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: drei Felder",
+        "input"            : "struct x {\n  xCoord : integer;\n  isSet : boolean;\n  s : string;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: definition und Globale Variable",
+        "input"            : "struct x {\n  xCoord : integer;\n}\nmyStruct : x;",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: falsches Schlüsselwort",
+        "input"            : "strut meinStruct42 {\n  xCoord : integer;\n  yCoord : integer;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: Feldname fehlt",
+        "input"            : "struct meinStruct42 {\n  : integer;\n  yCoord : integer;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: verschachtelte Funktion",
+        "input"            : "struct meinStruct {\n  xCoord : integer;\n  fun bla() {}\n  yCoord : integer;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: Felddefinition inkorrekt",
+        "input"            : "struct meinStruct42 {\n  name,name2 : integer;\n  yCoord : integer;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: Zugriff",
+        "input"            : "struct test {\n    value1 : integer;\n    value2 : integer;\n}\nfun fields() {\n   myTest : test;\n   i : integer;\n   myTest->value1 = 1 + 1;\n   i = myTest->value2 * myTest->value1;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: Feldname fehlt (linke Seite)",
+        "input"            : "struct test {\n    value1 : integer;\n    value2 : integer;\n}\nfun fields() {\n   myTest : test;\n   myTest-> = 1 + 1;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: Feldname fehlt (rechte Seite)",
+        "input"            : "struct test {\n    value1 : integer;\n    value2 : integer;\n}\nfun fields() {\n   myTest : test;\n   i : integer;\n   i = myTest-> + 1;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: verschachtelter Zugriff",
+        "input"            : "struct test {\n    value1 : integer;\n    value2 : integer;\n}\nstruct test2 {\n    val : test;\n}\nfun fields() {\n   myTest : test2;\n   i : integer;\n   myTest->val->value1 = 1 + 1;\n   i = myTest->val->value2 * myTest->val->value1;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: falsche Verschachtelung",
+        "input"            : "struct test {\n    value1 : integer;\n    value2 : integer;\n}\nstruct test2 {\n    test : val;\n}\nfun fields() {\n    myTest : test2;\n    i : integer;\n    myTest->val-> = 1 + 1;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Struct: als Parameter und Local",
+        "input"            : "struct myStruct {\n  f1 : integer;\n}\nfun name(param : myStruct) {\n    local : myStruct;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Array: Zugriff (eindimensional)",
+        "input"            : "values : boolean[];\nfun fields() {\n    result : boolean;\n    values[0] = true;\n    values[1] = false;\n    result = values[0] && values[1];\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Array: Fehlende schliessende Klammer (eindimensional)",
+        "input"            : "fun fields() {\n    values : boolean[];\n    result : boolean;\n    values[0] = true;\n    values[1 = false;\n    result = values[0] && values[1];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Array: Fehlende öffnende Klammer (eindimensional)",
+        "input"            : "fun fields() {\n    values : boolean[];\n    result : boolean;\n    values[0] = true;\n    values[1] = false;\n    result = values0] && values[1];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Array: Zugriff (zweidimensional)",
+        "input"            : "fun fields() {\n    values : integer[][];\n    i : integer;\n    values[0][0] = 1;\n    values[1][1] = 2;\n    i = values[0][0] + values[1][1];\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Array: Zugriff (mehrdimensional)",
+        "input"            : "fun fields() {\n    values : integer[][][];\n    i : integer;\n    values[0][0][2] = 1;\n    values[1][1][3] = 2;\n    i = values[0][0][2] * values[1][1][3];\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Array: Index fehlt (mehrdimensional)",
+        "input"            : "fun fields() {\n    values : integer[][][];\n    i : integer;\n    values[0][][2] = 1;\n    values[1][1][3] = 2;\n    i = values[0][0][2] * values[1][1][3];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Array: Zugriff (Structvariante)",
+        "input"            : "struct test {\n  f1 : integer[];\n  f2 : integer[];\n}\nvalues : test;\nfun fields() {\n   i : integer;\n   values->f1[0] = 1;\n   values->f2[1] = 2;\n   i = values->f1[0] + values->f2[1];\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Array: Index fehlt (Structvariante)",
+        "input"            : "struct test {\n  f1 : integer[];\n  f2 : integer[];\n}\nvalues : test[];\nfun func() {\n   i : integer;\n   values[0]->f1 = 1;\n   values[]->f2 = 2;\n   i = values[0]->f1 + values[0]->f2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Array: Als Parameter und Local",
+        "input"            : "fun func(param : integer[]) {\n    local : integer[];\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.2
+    },
+    {
+        "name"             : "Referenz: Ein Parameter",
+        "input"            : "fun func(out abc : integer) {\n    abc = 1;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Referenz: Zwei Parameter",
+        "input"            : "fun func(out abc : integer, out xyz : string) {\n    abc = 1;\n    xyz = \"abc\";\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "Referenz: Fehlender Typ und Bezeichner",
+        "input"            : "fun func(out ) {\n    abc = 1;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.33
+    },
+    {
+        "name"             : "Referenz: Fehler im Schlüsselwort",
+        "input"            : "fun func(outer abc : integer) {\n    abc = 1;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.33
+    },
+    {
+        "name"             : "Referenz: Fehlendes Komma",
+        "input"            : "fun func(out abc : integer out xyz : string) {\n    abc = 1;\n    xyz = \"abc\";\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.34
+    },
+    {
+        "name"             : "Komplex: Kombinationen",
+        "input"            : "j : integer;\nstruct myStruct {\n    field1 : integer;\n    field2 : string;\n    field3 : boolean;\n}\nfun stmt1() { }\nfun stmt2() { }\nfun myWhile() {\n    x : integer;\n    while(x > 1) {\n        stmt1();\n        stmt2();\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Komplex: Weitere Kombinationen",
+        "input"            : "global1 : integer;\nglobal2 : integer;\nfun stmt1() { }\nfun stmt2() { }\nfun myWhile(x : integer) {\n    while(x > 1) {\n        stmt1();\n        stmt2();\n    }\n}\nstruct myStruct {\n    field1 : integer;\n    field2 : string;\n    field3 : boolean;\n}\nstruct myStruct2 {\n    field1 : integer;\n    field2 : string;\n    field3 : myStruct;\n}\nfun myIf(x : integer) {\n    if(x > 1) {\n        stmt1();\n        stmt2();\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Komplex: GCD",
+        "input"            : "fun gcd(n1 : integer, n2 : integer) {\n    while (n1 != n2) {\n        if (n1 > n2) {\n            n1 = n1 - n2;\n        } else {\n            n2 = n2 - n1;\n        }\n    }\n    writeInt(n2);\n}\nfun main() : integer {\n  gcd(60, 50);\n  return 0;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Komplex: QuickSort",
+        "input"            : "fun quickSort(out arr : integer[], from : integer, to : integer) {\n    partitionIndex : integer;\n     if (from < to) {\n        partition(arr, partitionIndex, from, to);\n        quickSort(arr, from, partitionIndex - 1);\n        quickSort(arr, partitionIndex + 1, to);\n     }\n}\nfun partition(out arr : integer[], out partitionIndex : integer, from : integer, to : integer) {\n    pivot : integer;\n    i : integer;\n    j : integer;\n    swapTemp : integer;\n    pivot = arr[to];\n    i = from - 1;\n    j = from;\n    while (j < to) {\n        if (arr[j] <= pivot) {\n            i = i + 1;\n            swapTemp = arr[i];\n            arr[i] = arr[j];\n            arr[j] = swapTemp;\n        }\n        j = j + 1;\n    }\n    swapTemp = arr[i + 1];\n    arr[i + 1] = arr[to];\n    arr[to] = swapTemp;\n    partitionIndex = i + 1;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Komplex: Kombinationen (mit Fehler)",
+        "input"            : "j : integer;\nstruct myStruct {\n    field1 : integer;\n    field2 : string;\n    field3 : boolean\n}\nfun stmt1() { }\nfun stmt2() { }\nfun myWhile() {\n    x : integer;\n    while(x > 1) {\n        stmt1();\n        stmt2();\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Komplex: Weitere Kombinationen (mit Fehler)",
+        "input"            : "global1 : integer;\nglobal2 : integer;\nfun stmt1() { }\nfun stmt2() { }\nfun myWhile(x : integer) {\n    while(x > 1) {\n        stmt1();\n        stmt2();\n    }\n}\nstruct myStruct {\n    field1 : integer;\n    field2 : string;\n    field3 : boolean;\n}\nstruct myStruct2 {\n    field1 : integer;\n    field2 : string;\n    field3 : myStruct;\n}\nfun myIf(integer) {\n    if(x > 1) {\n        stmt1();\n        stmt2();\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Komplex: GCD (mit Fehler)",
+        "input"            : "fun gcd(n1 : integer, n2 : integer) {\n    while (n1 ! n2) {\n        if (n1 > n2) {\n            n1 = n1 - n2;\n        } else {\n            n2 = n2 - n1;\n        }\n    }\n    writeInt(n2);\n}\nfun main() : integer {\n  gcd(60, 50);\n  return 0;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    },
+    {
+        "name"             : "Komplex: QuickSort (mit Fehler)",
+        "input"            : "fun quickSort(out arr : integer[], from : integer, to : integer) {\n    partitionIndex : integer;\n     if (from < to) {\n        partition(arr, partitionIndex, from, to);\n        quickSort(arr, from, partitionIndex - 1);\n        quickSort(arr, partitionIndex + 1, to);\n     }\n}\nfun partition(out arr : integer[], out partitionIndex : integer, from : integer, to : integer) {\n    pivot : integer;\n    i : integer;\n    j : integer;\n    swapTemp : integer;\n    pivot = arr[to;\n    i = from - 1;\n    j = from;\n    while (j < to) {\n        if (arr[j] <= pivot) {\n            i = i + 1;\n            swapTemp = arr[i];\n            arr[i] = arr[j];\n            arr[j] = swapTemp;\n        }\n        j = j + 1;\n    }\n    swapTemp = arr[i + 1];\n    arr[i + 1] = arr[to];\n    arr[to] = swapTemp;\n    partitionIndex = i + 1;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.25
+    }  ]
+}
