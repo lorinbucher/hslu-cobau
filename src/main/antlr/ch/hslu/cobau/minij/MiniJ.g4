@@ -8,18 +8,19 @@ package ch.hslu.cobau.minij;
 
 unit : ; // empty rule to make project compile
 
-tokens:  declaration+  (declaration* | function* | declaration statement*) EOF;
-type: (INT|BOOLEAN|STRING| (INT|BOOLEAN|STRING)'[' ']');
+program:  declaration+  (declaration* | function* | declaration statement*) EOF;
+type: (INT | BOOLEAN | STRING | (INT | BOOLEAN | STRING) '[' ']');
 declaration: IDENTIFIER COL type SEMI;
 
-statement: INDENT | /*ASSIGNMENT*/ (expression | function | block) SEMI;
-expression: (postfix
+statement:  (assignment SEMI | expression SEMI | function | controlStructure);
+assignment: IDENTIFIER EQUAL expression;
+expression: postfix
            | prefix
+           //| NUMBER
            | NUMBER dotExpr
            | NUMBER dashExpr
            | NUMBER relational
-           | NUMBER equality
-           | NUMBER) SEMI;
+           | NUMBER equality;
 postfix: IDENTIFIER (INCREMENT|DECREMENT);
 prefix: (INCREMENT|DECREMENT|NOT|PLUS|MINUS)IDENTIFIER;
 dotExpr: (TIMES | DIV | MOD) expression;
@@ -29,7 +30,7 @@ equality: (EQUAL | NOTEQUAL);
 
 function: FUN IDENTIFIER OPENB(/* TODO parameter definition, comma separated, 'name : type' */ )CLOSEB COL type OPENP
  (declaration* | expression*) RETURN (expression)? CLOSEP ;
-block:  IF OPENB expression CLOSEB OPENP statement CLOSEP       // if (condition) {statement}
+controlStructure:  IF OPENB expression CLOSEB OPENP statement CLOSEP       // if (condition) {statement}
         (ELSE OPENP statement CLOSEP)?                     // 0 or 1 else statements
         |WHILE OPENB expression CLOSEB OPENP statement CLOSEP;             //(condition) {statement}
 
