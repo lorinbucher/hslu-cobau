@@ -6,57 +6,77 @@ package ch.hslu.cobau.minij;
 
 // milestone 2: parser
 
-unit : ; // empty rule to make project compile
+// Parser Rules
+unit : (declaration | function | struct)* EOF;
 
-tokens:  declaration+  (declaration* | function* | declaration statement*) EOF;
-type: (INT|BOOLEAN|STRING| (INT|BOOLEAN|STRING)'[' ']');
-declaration: IDENTIFIER COL type SEMI;
+comparator: (EQUAL | NOTEQUAL | GREATER | LOWER | GEQUAL | LEQUAL);
+logic_operator: (NOT | AND | OR);
+math_operator: (ADD | SUB | MUL | DIV | MOD);
+type: (BOOLEAN | INTEGER | STRING) (LBRACK RBRACK)?;
+value: (TRUE | FALSE | NUMBER | TEXT);
 
-statement: INDENT | /*ASSIGNMENT*/ (expression | function | block) SEMI;
-expression: (postfix
-           | prefix
-           | NUMBER dotExpr
-           | NUMBER dashExpr
-           | NUMBER relational
-           | NUMBER equality
-           | NUMBER) SEMI;
-postfix: IDENTIFIER (INCREMENT|DECREMENT);
-prefix: (INCREMENT|DECREMENT|NOT|PLUS|MINUS)IDENTIFIER;
-dotExpr: (TIMES | DIV | MOD) expression;
-dashExpr: (PLUS | MINUS) expression;
-relational:(GREATER | LOWER | GEQUAL | LEQUAL) expression;
-equality: (EQUAL | NOTEQUAL);
+declaration: IDENTIFIER COLON (type | IDENTIFIER) SEMICOLON;
+parameter: IDENTIFIER COLON (type | IDENTIFIER);
+parameter_list: LPAREN (parameter (COMMA parameter)*)? RPAREN;
 
-function: FUN IDENTIFIER OPENB(/* TODO parameter definition, comma separated, 'name : type' */ )CLOSEB COL type OPENP
- (declaration* | expression*) RETURN (expression)? CLOSEP ;
-block:  IF OPENB expression CLOSEB OPENP statement CLOSEP       // if (condition) {statement}
-        (ELSE OPENP statement CLOSEP)?                     // 0 or 1 else statements
-        |WHILE OPENB expression CLOSEB OPENP statement CLOSEP;             //(condition) {statement}
+pre_expr: (INC | DEC) IDENTIFIER;
+post_expr: IDENTIFIER (INC | DEC);
+memory_expr: (INC INC | DEC DEC) IDENTIFIER; // NOTE: never heard of this, ask Martin Bättig
 
-// TODO struct
-// TODO array
-// zuweisung ? zur Einschränkung der möglichen Zeichen, int können nur Zahlen sein, etc
+comp_expr: LPAREN? (IDENTIFIER | NUMBER | struct_access) comparator (IDENTIFIER | NUMBER | struct_access) RPAREN?;
+logic_expr: NOT? LPAREN? comp_expr ((AND | OR) NOT? comp_expr)* RPAREN?;
+math_expr: (IDENTIFIER | NUMBER | pre_expr | post_expr | function_call | struct_access) math_operator (IDENTIFIER | NUMBER | pre_expr | post_expr | function_call | math_expr | struct_access)
+    | SUB? LPAREN math_expr RPAREN
+    | math_expr math_operator math_expr;
+unary_expr: SUB? (IDENTIFIER | NUMBER)
+    | NOT? IDENTIFIER
+    | pre_expr
+    | post_expr;
+expression: comp_expr | logic_expr | math_expr | unary_expr;
 
+assignment: (IDENTIFIER | struct_access)(LBRACK (IDENTIFIER | NUMBER) RBRACK)? ASSIGN (value | expression | memory_expr | function_call) SEMICOLON;
+function_call: IDENTIFIER LPAREN ((value | expression) (COMMA (value | expression))*)? RPAREN;
+
+block: LBRACE
+    (assignment | declaration | condition | loop | function_call SEMICOLON)*
+    (LBRACE (assignment | condition | loop | function_call SEMICOLON)* RBRACE)*
+    (RETURN (value | expression)? SEMICOLON)?
+    RBRACE SEMICOLON?;
+condition: IF LPAREN comp_expr RPAREN ((block
+        (ELSE IF LPAREN comp_expr RPAREN block)*
+        (ELSE block)?)
+    | (RETURN (value | expression)? SEMICOLON ELSE RETURN (value | expression)? SEMICOLON));
+function: FUNCTION IDENTIFIER parameter_list (COLON type)? block;
+loop: WHILE LPAREN comp_expr RPAREN (block | assignment);
+struct: STRUCT IDENTIFIER LBRACE declaration* RBRACE;
+struct_access: IDENTIFIER (ACCESS IDENTIFIER)+;
+
+
+// Scanner Rules
 BOOLEAN: 'boolean';
-INT: 'int';
+INTEGER: 'integer';
 STRING: 'string';
-FUN: 'fun'; // function => fun name(parameter1 : int, p2: boolean, TEXT: string){}
+FUNCTION: 'fun';
 
-DOT: '.';
-COL: ':';
-SEMI: ';';
-OPENB: '(';
-CLOSEB:')';
-OPENP:'{';
-CLOSEP:'}';
+COMMA: ',';
+COLON: ':';
+SEMICOLON: ';';
+LPAREN: '(';
+RPAREN: ')';
+LBRACE: '{';
+RBRACE: '}';
+LBRACK: '[';
+RBRACK: ']';
+ACCESS: '->';
 
-PLUS: 'plus'|'+';
-MINUS: 'minus'|'-';
-TIMES: 'times'|'*';
-DIV: 'div'|'/';
-MOD: 'mod' | '%';
-INCREMENT: '++';
-DECREMENT: '--';
+ASSIGN: '=';
+ADD: '+';
+SUB: '-';
+MUL: '*';
+DIV: '/';
+MOD: '%';
+INC: '++';
+DEC: '--';
 
 NOT: '!';
 EQUAL: '==';
@@ -65,28 +85,28 @@ GREATER: '>';
 LOWER: '<';
 GEQUAL: '>=';
 LEQUAL: '<=';
-LAND: '&&';
-LOR: '||';
+AND: '&&';
+OR: '||';
 TRUE: 'true';
 FALSE: 'false';
 
-
 STRUCT: 'struct';
+WHILE: 'while';
 IF: 'if';
 ELSE: 'else';
-WHILE: 'while';
-OUT: 'out';
-SIZE: 'size';
 RETURN: 'return';
+
+SIZE: 'size';
 READINT: 'readInt';
 WRITEINT: 'writeInt';
 READCHAR: 'readChar';
 WRITECHAR: 'writeChar';
-DIGITS: [0-9];
-NUMBER: '-'?DIGITS+;
-LETTERS: [a-zA-Z]+;
-IDENTIFIER: [a-zA-Z][a-zA-Z0-9_]*;
-INDENT: [ \t\r\n]+ -> skip;
-MULTICOMMENT: '/*' .*? '*/' -> skip;
-SINGLECOMMENT: '///' ~[\r\n]* -> skip;
 
+INDENT: [ \t\r\n]+ -> skip;
+LINECOMMENT: '//' ~[\r\n]* -> skip ;
+BLOCKCOMMENT: '/*' .*? '*/' -> skip;
+
+NUMBER: [+-]?[0-9]+;
+TEXT: '"' ('\\"'|.)*? '"';
+
+IDENTIFIER: [a-zA-Z][a-zA-Z0-9_$]*;
