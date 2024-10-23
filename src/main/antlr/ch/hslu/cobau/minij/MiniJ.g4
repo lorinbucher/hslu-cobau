@@ -16,7 +16,7 @@ type: (BOOLEAN | INTEGER | STRING) (LBRACK RBRACK)?;
 value: (TRUE | FALSE | NUMBER | TEXT);
 
 declaration: IDENTIFIER COLON (type | IDENTIFIER) SEMICOLON;
-parameter: IDENTIFIER COLON (type | IDENTIFIER);
+parameter: OUT? IDENTIFIER COLON (type | IDENTIFIER);
 parameter_list: LPAREN (parameter (COMMA parameter)*)? RPAREN;
 
 pre_expr: (INC | DEC) IDENTIFIER;
@@ -96,6 +96,7 @@ IF: 'if';
 ELSE: 'else';
 RETURN: 'return';
 
+OUT: 'out';
 SIZE: 'size';
 //READINT: 'readInt';
 //WRITEINT: 'writeInt';
