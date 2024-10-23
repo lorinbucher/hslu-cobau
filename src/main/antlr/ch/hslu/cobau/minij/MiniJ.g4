@@ -12,7 +12,7 @@ unit : (declaration | function | struct)* EOF;
 comparator: (EQUAL | NOTEQUAL | GREATER | LOWER | GEQUAL | LEQUAL);
 logic_operator: (NOT | AND | OR);
 math_operator: (ADD | SUB | MUL | DIV | MOD);
-type: (BOOLEAN | INTEGER | STRING) (LBRACK RBRACK)?;
+type: (BOOLEAN | INTEGER | STRING) array?;
 value: (TRUE | FALSE | NUMBER | TEXT);
 
 declaration: IDENTIFIER COLON (type | IDENTIFIER) SEMICOLON;
@@ -23,9 +23,9 @@ pre_expr: (INC | DEC) IDENTIFIER;
 post_expr: IDENTIFIER (INC | DEC);
 memory_expr: (INC INC | DEC DEC) IDENTIFIER; // NOTE: never heard of this, ask Martin Bättig
 
-comp_expr: LPAREN? (IDENTIFIER | NUMBER | struct_access) comparator (IDENTIFIER | NUMBER | struct_access) RPAREN?;
+comp_expr: LPAREN? (IDENTIFIER array_access? | NUMBER | struct_access) (comparator) (IDENTIFIER array_access? | NUMBER | struct_access) RPAREN?;
 logic_expr: NOT? LPAREN? comp_expr ((AND | OR) NOT? comp_expr)* RPAREN?;
-math_expr: (IDENTIFIER | NUMBER | pre_expr | post_expr | function_call | struct_access) math_operator (IDENTIFIER | NUMBER | pre_expr | post_expr | function_call | math_expr | struct_access)
+math_expr: (IDENTIFIER array_access? | NUMBER | pre_expr | post_expr | function_call | struct_access) math_operator (IDENTIFIER array_access? | NUMBER | pre_expr | post_expr | function_call | math_expr | struct_access)
     | SUB? LPAREN math_expr RPAREN
     | math_expr math_operator math_expr;
 unary_expr: SUB? (IDENTIFIER | NUMBER)
@@ -34,7 +34,7 @@ unary_expr: SUB? (IDENTIFIER | NUMBER)
     | post_expr;
 expression: comp_expr | logic_expr | math_expr | unary_expr;
 
-assignment: (IDENTIFIER | struct_access)(LBRACK (IDENTIFIER | NUMBER) RBRACK)? ASSIGN (value | expression | memory_expr | function_call) SEMICOLON;
+assignment: (IDENTIFIER array_access? | struct_access)   ASSIGN (value | expression | memory_expr | function_call | IDENTIFIER array_access) SEMICOLON;
 function_call: IDENTIFIER LPAREN ((value | expression) (COMMA (value | expression))*)? RPAREN;
 
 block: LBRACE
@@ -50,6 +50,8 @@ function: FUNCTION IDENTIFIER parameter_list (COLON type)? block;
 loop: WHILE LPAREN comp_expr RPAREN (block | assignment);
 struct: STRUCT IDENTIFIER LBRACE declaration* RBRACE;
 struct_access: IDENTIFIER (ACCESS IDENTIFIER)+;
+array: (LBRACK RBRACK)*;
+array_access: (LBRACK (IDENTIFIER | NUMBER | expression) RBRACK)* ;
 
 
 // Scanner Rules
