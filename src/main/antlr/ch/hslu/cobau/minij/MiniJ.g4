@@ -97,10 +97,10 @@ ELSE: 'else';
 RETURN: 'return';
 
 SIZE: 'size';
-READINT: 'readInt';
-WRITEINT: 'writeInt';
-READCHAR: 'readChar';
-WRITECHAR: 'writeChar';
+//READINT: 'readInt';
+//WRITEINT: 'writeInt';
+//READCHAR: 'readChar';
+//WRITECHAR: 'writeChar';
 
 INDENT: [ \t\r\n]+ -> skip;
 LINECOMMENT: '//' ~[\r\n]* -> skip ;

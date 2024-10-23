@@ -89,7 +89,7 @@ afterEvaluate {
     }
 
     def submissionTask = tasks.create(name : 'makeSubmission', type: Zip, group: 'build') {
-        archiveFileName = "COBAU-MSx-Gyy.zip"
+        archiveFileName = "COBAU-MS1-G02.zip"
         destinationDirectory = layout.projectDirectory
         from(layout.projectDirectory.dir("reports")) {
             into "reports"
