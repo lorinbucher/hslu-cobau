@@ -34,7 +34,7 @@ unary_expr: SUB? (IDENTIFIER | NUMBER)
     | post_expr;
 expression: comp_expr | logic_expr | math_expr | unary_expr;
 
-assignment: (IDENTIFIER array_access? | struct_access)   ASSIGN (value | expression | memory_expr | function_call | IDENTIFIER array_access) SEMICOLON;
+assignment: (IDENTIFIER array_access? | struct_access)   ASSIGN (value | expression | memory_expr | function_call | IDENTIFIER array_access?) SEMICOLON;
 function_call: IDENTIFIER LPAREN ((value | expression) (COMMA (value | expression))*)? RPAREN;
 
 block: LBRACE
@@ -49,7 +49,7 @@ condition: IF LPAREN comp_expr RPAREN ((block
 function: FUNCTION IDENTIFIER parameter_list (COLON type)? block;
 loop: WHILE LPAREN comp_expr RPAREN (block | assignment);
 struct: STRUCT IDENTIFIER LBRACE declaration* RBRACE;
-struct_access: IDENTIFIER (ACCESS IDENTIFIER)+;
+struct_access: IDENTIFIER (ACCESS IDENTIFIER array_access?)+;
 array: (LBRACK RBRACK)*;
 array_access: (LBRACK (IDENTIFIER | NUMBER | expression) RBRACK)* ;
 
