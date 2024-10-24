@@ -50,8 +50,8 @@ function: FUNCTION IDENTIFIER parameter_list (COLON type)? block;
 loop: WHILE LPAREN comp_expr RPAREN (block | assignment);
 struct: STRUCT IDENTIFIER LBRACE declaration* RBRACE;
 struct_access: IDENTIFIER (ACCESS IDENTIFIER array_access?)+;
-array: (LBRACK RBRACK)*;
-array_access: (LBRACK (IDENTIFIER | NUMBER | expression) RBRACK)* ;
+array: (LBRACK RBRACK)+;
+array_access: (LBRACK (IDENTIFIER | NUMBER | expression) RBRACK)+ ;
 
 
 // Scanner Rules
