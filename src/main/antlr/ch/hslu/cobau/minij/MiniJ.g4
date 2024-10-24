@@ -9,6 +9,7 @@ package ch.hslu.cobau.minij;
 // Parser Rules
 unit : (declaration | function | struct)* EOF;
 
+built_in: (READINT | WRITEINT | READCHAR | WRITECHAR);
 comparator: (EQUAL | NOTEQUAL | GREATER | LOWER | GEQUAL | LEQUAL);
 logic_operator: (NOT | AND | OR);
 math_operator: (ADD | SUB | MUL | DIV | MOD);
@@ -36,10 +37,11 @@ expression: comp_expr | logic_expr | math_expr | unary_expr;
 
 assignment: (IDENTIFIER array_access? | struct_access) ASSIGN (value | expression | memory_expr | function_call | IDENTIFIER array_access?) SEMICOLON;
 function_call: IDENTIFIER LPAREN ((value | expression) (COMMA (value | expression))*)? RPAREN;
+io_call: built_in LPAREN (IDENTIFIER array_access? | NUMBER) RPAREN SEMICOLON;
 
 block: LBRACE
-    (assignment | declaration | condition | loop | function_call SEMICOLON)*
-    (LBRACE (assignment | condition | loop | function_call SEMICOLON)* RBRACE)*
+    (assignment | declaration | condition | loop | io_call | function_call SEMICOLON)*
+    (LBRACE (assignment | condition | loop | io_call | function_call SEMICOLON)* RBRACE)*
     (RETURN (value | expression)? SEMICOLON)?
     RBRACE SEMICOLON?;
 condition: IF LPAREN comp_expr RPAREN ((block
@@ -100,10 +102,10 @@ RETURN: 'return';
 
 OUT: 'out';
 SIZE: 'size';
-//READINT: 'readInt';
-//WRITEINT: 'writeInt';
-//READCHAR: 'readChar';
-//WRITECHAR: 'writeChar';
+READINT: 'readInt';
+WRITEINT: 'writeInt';
+READCHAR: 'readChar';
+WRITECHAR: 'writeChar';
 
 INDENT: [ \t\r\n]+ -> skip;
 LINECOMMENT: '//' ~[\r\n]* -> skip ;
