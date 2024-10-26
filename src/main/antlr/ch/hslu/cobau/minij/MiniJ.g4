@@ -23,6 +23,7 @@ value: (boolean_value | numeric_value | TEXT);
 declaration: IDENTIFIER COLON (type | IDENTIFIER) SEMICOLON;
 parameter: OUT? IDENTIFIER COLON (type | IDENTIFIER);
 parameter_list: LPAREN (parameter (COMMA parameter)*)? RPAREN;
+return_stmt: RETURN (value | expression)? SEMICOLON;
 
 pre_expr: (INC | DEC) IDENTIFIER;
 post_expr: IDENTIFIER (INC | DEC);
@@ -46,12 +47,12 @@ io_call: built_in LPAREN (IDENTIFIER array_access? | NUMBER) RPAREN SEMICOLON;
 block: LBRACE
     (assignment | declaration | condition | loop | io_call | function_call SEMICOLON)*
     (LBRACE (assignment | condition | loop | io_call | function_call SEMICOLON)* RBRACE)*
-    (RETURN (value | expression)? SEMICOLON)?
+    return_stmt?
     RBRACE SEMICOLON?;
 condition: IF LPAREN comp_expr RPAREN ((block
         (ELSE IF LPAREN comp_expr RPAREN block)*
         (ELSE block)?)
-    | (RETURN (value | expression)? SEMICOLON ELSE RETURN (value | expression)? SEMICOLON));
+    | (return_stmt ELSE return_stmt));
 function: FUNCTION IDENTIFIER parameter_list (COLON type)? block;
 loop: WHILE LPAREN comp_expr RPAREN (block | assignment);
 struct: STRUCT IDENTIFIER LBRACE declaration* RBRACE;
