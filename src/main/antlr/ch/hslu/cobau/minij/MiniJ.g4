@@ -11,7 +11,7 @@ unit : (declaration | function | struct)* EOF;
 
 built_in: (READINT | WRITEINT | READCHAR | WRITECHAR);
 comparator: (EQUAL | NOTEQUAL | GREATER | LOWER | GEQUAL | LEQUAL);
-logic_operator: (NOT | AND | OR);
+logic_operator: (AND | OR);
 math_operator: (ADD | SUB | MUL | DIV | MOD);
 type: (BOOLEAN | INTEGER | STRING) array?;
 value: (TRUE | FALSE | NUMBER | TEXT);
@@ -25,7 +25,7 @@ post_expr: IDENTIFIER (INC | DEC);
 memory_expr: (INC INC | DEC DEC) IDENTIFIER; // NOTE: never heard of this, ask Martin Bättig
 
 comp_expr: LPAREN? ((IDENTIFIER array_access? | NUMBER | struct_access) (comparator) (IDENTIFIER array_access? | NUMBER | struct_access) | IDENTIFIER array_access?) RPAREN?;
-logic_expr: NOT? LPAREN? comp_expr ((AND | OR) NOT? comp_expr)* RPAREN?;
+logic_expr: NOT? LPAREN? comp_expr (logic_operator NOT? comp_expr)* RPAREN?;
 math_expr: (IDENTIFIER array_access? | NUMBER | pre_expr | post_expr | function_call | struct_access) math_operator (IDENTIFIER array_access? | NUMBER | pre_expr | post_expr | function_call | math_expr | struct_access)
     | SUB? LPAREN math_expr RPAREN
     | math_expr math_operator math_expr;
