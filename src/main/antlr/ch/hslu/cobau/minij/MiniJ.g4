@@ -14,7 +14,11 @@ comparator: (EQUAL | NOTEQUAL | GREATER | LOWER | GEQUAL | LEQUAL);
 logic_operator: (AND | OR);
 math_operator: (ADD | SUB | MUL | DIV | MOD);
 type: (BOOLEAN | INTEGER | STRING) | type (LBRACK RBRACK);
-value: (TRUE | FALSE | NUMBER | TEXT);
+
+array_size: IDENTIFIER ACCESS SIZE;
+boolean_value: (TRUE | FALSE);
+numeric_value: (NUMBER | array_size);
+value: (boolean_value | numeric_value | TEXT);
 
 declaration: IDENTIFIER COLON (type | IDENTIFIER) SEMICOLON;
 parameter: OUT? IDENTIFIER COLON (type | IDENTIFIER);
@@ -52,7 +56,7 @@ function: FUNCTION IDENTIFIER parameter_list (COLON type)? block;
 loop: WHILE LPAREN comp_expr RPAREN (block | assignment);
 struct: STRUCT IDENTIFIER LBRACE declaration* RBRACE;
 struct_access: IDENTIFIER (ACCESS IDENTIFIER array_access?)+;
-array_access: (LBRACK (IDENTIFIER | NUMBER | expression) RBRACK)+ ;
+array_access: (LBRACK (IDENTIFIER | NUMBER | expression) RBRACK)+;
 
 
 // Scanner Rules
