@@ -13,7 +13,7 @@ built_in: (READINT | WRITEINT | READCHAR | WRITECHAR);
 comparator: (EQUAL | NOTEQUAL | GREATER | LOWER | GEQUAL | LEQUAL);
 logic_operator: (AND | OR);
 math_operator: (ADD | SUB | MUL | DIV | MOD);
-type: (BOOLEAN | INTEGER | STRING) array?;
+type: (BOOLEAN | INTEGER | STRING) | type (LBRACK RBRACK);
 value: (TRUE | FALSE | NUMBER | TEXT);
 
 declaration: IDENTIFIER COLON (type | IDENTIFIER) SEMICOLON;
@@ -52,7 +52,6 @@ function: FUNCTION IDENTIFIER parameter_list (COLON type)? block;
 loop: WHILE LPAREN comp_expr RPAREN (block | assignment);
 struct: STRUCT IDENTIFIER LBRACE declaration* RBRACE;
 struct_access: IDENTIFIER (ACCESS IDENTIFIER array_access?)+;
-array: (LBRACK RBRACK)+;
 array_access: (LBRACK (IDENTIFIER | NUMBER | expression) RBRACK)+ ;
 
 
