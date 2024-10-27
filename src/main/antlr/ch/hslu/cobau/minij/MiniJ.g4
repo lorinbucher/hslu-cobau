@@ -43,7 +43,7 @@ memory_expr: (INC INC | DEC DEC) variable; // NOTE: never heard of this, does th
 
 comp_expr: LPAREN comp_expr RPAREN
     | math_expr relational_ops math_expr
-    | math_expr equality_ops math_expr;
+    | (TEXT | math_expr) equality_ops (TEXT | math_expr);
 logic_expr: LPAREN logic_expr RPAREN
     | NOT logic_expr
     | comp_expr
