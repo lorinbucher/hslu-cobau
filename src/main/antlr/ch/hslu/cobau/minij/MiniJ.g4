@@ -9,58 +9,71 @@ package ch.hslu.cobau.minij;
 // Parser Rules
 unit : (declaration | function | struct)* EOF;
 
-built_in: (READINT | WRITEINT | READCHAR | WRITECHAR);
-comparator: (EQUAL | NOTEQUAL | GREATER | LOWER | GEQUAL | LEQUAL);
-logic_operator: (AND | OR);
-math_operator: (ADD | SUB | MUL | DIV | MOD);
-type: (BOOLEAN | INTEGER | STRING) | type (LBRACK RBRACK);
+multiplicative_ops: MUL | DIV | MOD;
+additive_ops: ADD | SUB;
+relational_ops: GREATER | LOWER | GEQUAL | LEQUAL;
+equality_ops: EQUAL | NOTEQUAL;
 
 array_size: IDENTIFIER ACCESS SIZE;
-boolean_value: (TRUE | FALSE);
-numeric_value: (NUMBER | array_size);
-value: (boolean_value | numeric_value | TEXT);
+boolean_value: TRUE | FALSE | func_call | variable;
+numeric_value: NUMBER | array_size | func_call | variable;
+value: TEXT | boolean_value | numeric_value;
+type: type (LBRACK RBRACK) | (BOOLEAN | INTEGER | STRING | IDENTIFIER);
 
-declaration: IDENTIFIER COLON (type | IDENTIFIER) SEMICOLON;
-parameter: OUT? IDENTIFIER COLON (type | IDENTIFIER);
-parameter_list: LPAREN (parameter (COMMA parameter)*)? RPAREN;
-return_stmt: RETURN (value | expression)? SEMICOLON;
+array_variable: IDENTIFIER LBRACK numeric_value RBRACK;
+struct_variable: IDENTIFIER ACCESS variable;
+variable: IDENTIFIER | array_variable | struct_variable;
 
-pre_expr: (INC | DEC) IDENTIFIER;
-post_expr: IDENTIFIER (INC | DEC);
-memory_expr: (INC INC | DEC DEC) IDENTIFIER; // NOTE: never heard of this, ask Martin Bättig
+func_builtin: READINT | WRITEINT | READCHAR | WRITECHAR;
+func_call: IDENTIFIER func_call_arg_list;
+func_call_arg_list: LPAREN (value (COMMA value)*)? RPAREN;
+func_param: OUT? IDENTIFIER COLON type;
+func_param_list: LPAREN (func_param (COMMA func_param)*)? RPAREN;
+func_return_type: COLON type;
+func_io_call: func_builtin LPAREN numeric_value? RPAREN;
 
-comp_expr: LPAREN? ((IDENTIFIER array_access? | NUMBER | struct_access) (comparator) (IDENTIFIER array_access? | NUMBER | struct_access) | IDENTIFIER array_access?) RPAREN?;
-logic_expr: NOT? LPAREN? comp_expr (logic_operator NOT? comp_expr)* RPAREN?;
-math_expr: (IDENTIFIER array_access? | NUMBER | pre_expr | post_expr | function_call | struct_access) math_operator (IDENTIFIER array_access? | NUMBER | pre_expr | post_expr | function_call | math_expr | struct_access)
-    | SUB? LPAREN math_expr RPAREN
-    | math_expr math_operator math_expr;
-unary_expr: SUB? (IDENTIFIER | NUMBER)
-    | NOT? IDENTIFIER
+assignment: variable ASSIGN (value | func_call | func_io_call | expression);
+declaration: IDENTIFIER COLON type SEMICOLON;
+return_stmt: RETURN value?;
+statement: (assignment | func_call | func_io_call | return_stmt) SEMICOLON;
+
+post_expr: variable (INC | DEC);
+pre_expr: (INC | DEC) variable;
+memory_expr: (INC INC | DEC DEC) variable; // NOTE: never heard of this, does that exist in any language?
+
+comp_expr: LPAREN comp_expr RPAREN
+    | numeric_value relational_ops numeric_value
+    | value equality_ops value;
+logic_expr: LPAREN logic_expr RPAREN
+    | NOT logic_expr
+    | comp_expr
+    | logic_expr AND logic_expr
+    | logic_expr OR logic_expr
+//    | func_call
+//    | variable
+    | boolean_value;
+math_expr: LPAREN math_expr RPAREN
+    | post_expr
     | pre_expr
-    | post_expr;
-expression: comp_expr | logic_expr | math_expr | unary_expr;
-
-assignment: (IDENTIFIER array_access? | struct_access) ASSIGN (value | expression | memory_expr | function_call | IDENTIFIER array_access?) SEMICOLON;
-function_call: IDENTIFIER LPAREN ((value | expression) (COMMA (value | expression))*)? RPAREN;
-io_call: built_in LPAREN (IDENTIFIER array_access? | NUMBER) RPAREN SEMICOLON;
+    | (ADD | SUB) math_expr
+    | math_expr multiplicative_ops math_expr
+    | math_expr additive_ops math_expr
+    | numeric_value;
+expression: memory_expr | math_expr | logic_expr;
 
 block: LBRACE
-    (assignment | block | condition | loop | io_call | function_call SEMICOLON)*
-    return_stmt?
+    (block | condition | loop | statement)*
     RBRACE SEMICOLON?;
-condition: IF LPAREN comp_expr RPAREN ((block
-        (ELSE IF LPAREN comp_expr RPAREN block)*
-        (ELSE block)?)
-    | (return_stmt ELSE return_stmt));
-function: FUNCTION IDENTIFIER parameter_list (COLON type)? LBRACE
+condition: IF LPAREN boolean_value RPAREN
+    (block | statement)
+    (ELSE IF LPAREN boolean_value RPAREN (block | statement))*
+    (ELSE (block | statement))?;
+function: FUNCTION IDENTIFIER func_param_list func_return_type? LBRACE
     declaration*
-    (assignment | block | condition | loop | io_call | function_call SEMICOLON)*
-    return_stmt?
+    (block | condition | loop | statement)*
     RBRACE SEMICOLON?;
-loop: WHILE LPAREN comp_expr RPAREN (block | assignment);
+loop: WHILE LPAREN boolean_value RPAREN (block | statement);
 struct: STRUCT IDENTIFIER LBRACE declaration* RBRACE;
-struct_access: IDENTIFIER (ACCESS IDENTIFIER array_access?)+;
-array_access: (LBRACK (IDENTIFIER | NUMBER | expression) RBRACK)+;
 
 
 // Scanner Rules
