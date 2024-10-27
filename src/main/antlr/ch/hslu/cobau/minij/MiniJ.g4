@@ -45,15 +45,18 @@ function_call: IDENTIFIER LPAREN ((value | expression) (COMMA (value | expressio
 io_call: built_in LPAREN (IDENTIFIER array_access? | NUMBER) RPAREN SEMICOLON;
 
 block: LBRACE
-    (assignment | declaration | condition | loop | io_call | function_call SEMICOLON)*
-    (LBRACE (assignment | condition | loop | io_call | function_call SEMICOLON)* RBRACE)*
+    (assignment | block | condition | loop | io_call | function_call SEMICOLON)*
     return_stmt?
     RBRACE SEMICOLON?;
 condition: IF LPAREN comp_expr RPAREN ((block
         (ELSE IF LPAREN comp_expr RPAREN block)*
         (ELSE block)?)
     | (return_stmt ELSE return_stmt));
-function: FUNCTION IDENTIFIER parameter_list (COLON type)? block;
+function: FUNCTION IDENTIFIER parameter_list (COLON type)? LBRACE
+    declaration*
+    (assignment | block | condition | loop | io_call | function_call SEMICOLON)*
+    return_stmt?
+    RBRACE SEMICOLON?;
 loop: WHILE LPAREN comp_expr RPAREN (block | assignment);
 struct: STRUCT IDENTIFIER LBRACE declaration* RBRACE;
 struct_access: IDENTIFIER (ACCESS IDENTIFIER array_access?)+;
