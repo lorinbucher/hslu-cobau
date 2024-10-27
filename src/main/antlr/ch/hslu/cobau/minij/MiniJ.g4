@@ -8,22 +8,22 @@ package ch.hslu.cobau.minij;
 
 // Parser Rules
 unit : (declaration | function | struct)* EOF;
-
+//ops
 multiplicative_ops: MUL | DIV | MOD;
 additive_ops: ADD | SUB;
 relational_ops: GREATER | LOWER | GEQUAL | LEQUAL;
 equality_ops: EQUAL | NOTEQUAL;
-
+//values
 array_size: IDENTIFIER ACCESS SIZE;
 boolean_value: TRUE | FALSE | variable | func_call | comp_expr | logic_expr;
 numeric_value: NUMBER | array_size | variable | func_call | func_io_call | math_expr;
 value: TEXT | variable | func_call | func_io_call | numeric_value | boolean_value;
 type: type (LBRACK RBRACK) | (BOOLEAN | INTEGER | STRING | IDENTIFIER);
-
+//structured data types
 array_variable: IDENTIFIER (LBRACK numeric_value RBRACK)+;
 struct_variable: IDENTIFIER ACCESS variable;
 variable: IDENTIFIER | array_variable | struct_variable;
-
+// function
 func_builtin: READINT | WRITEINT | READCHAR | WRITECHAR;
 func_call: IDENTIFIER func_call_arg_list;
 func_call_arg_list: LPAREN (value (COMMA value)*)? RPAREN;
@@ -41,6 +41,7 @@ post_expr: variable (INC | DEC);
 pre_expr: (INC | DEC) variable;
 memory_expr: (INC INC | DEC DEC) variable; // NOTE: never heard of this, does that exist in any language?
 
+// operator precedence
 comp_expr: LPAREN comp_expr RPAREN
     | math_expr relational_ops math_expr
     | (TEXT | math_expr) equality_ops (TEXT | math_expr);
@@ -64,7 +65,7 @@ math_expr: LPAREN math_expr RPAREN
     | variable
     | array_size
     | NUMBER;
-
+//(control) structures
 block: LBRACE
     (block | condition | loop | statement)*
     RBRACE SEMICOLON?;
