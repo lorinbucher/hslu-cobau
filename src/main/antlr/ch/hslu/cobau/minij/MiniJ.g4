@@ -17,7 +17,7 @@ equality_ops: EQUAL | NOTEQUAL;
 array_size: IDENTIFIER ACCESS SIZE;
 boolean_value: TRUE | FALSE | variable | func_call | comp_expr | logic_expr;
 numeric_value: NUMBER | array_size | variable | func_call | func_io_call | math_expr;
-value: TEXT | numeric_value | boolean_value;
+value: TEXT | variable | func_call | func_io_call | numeric_value | boolean_value;
 type: type (LBRACK RBRACK) | (BOOLEAN | INTEGER | STRING | IDENTIFIER);
 
 array_variable: IDENTIFIER (LBRACK numeric_value RBRACK)+;
