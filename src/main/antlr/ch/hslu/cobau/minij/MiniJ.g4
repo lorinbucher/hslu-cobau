@@ -15,12 +15,12 @@ relational_ops: GREATER | LOWER | GEQUAL | LEQUAL;
 equality_ops: EQUAL | NOTEQUAL;
 
 array_size: IDENTIFIER ACCESS SIZE;
-boolean_value: TRUE | FALSE | func_call | variable;
-numeric_value: NUMBER | array_size | func_call | variable;
-value: TEXT | boolean_value | numeric_value;
+boolean_value: TRUE | FALSE | variable | func_call | comp_expr | logic_expr;
+numeric_value: NUMBER | array_size | variable | func_call | func_io_call | math_expr;
+value: TEXT | numeric_value | boolean_value;
 type: type (LBRACK RBRACK) | (BOOLEAN | INTEGER | STRING | IDENTIFIER);
 
-array_variable: IDENTIFIER LBRACK numeric_value RBRACK;
+array_variable: IDENTIFIER (LBRACK numeric_value RBRACK)+;
 struct_variable: IDENTIFIER ACCESS variable;
 variable: IDENTIFIER | array_variable | struct_variable;
 
@@ -32,7 +32,7 @@ func_param_list: LPAREN (func_param (COMMA func_param)*)? RPAREN;
 func_return_type: COLON type;
 func_io_call: func_builtin LPAREN numeric_value? RPAREN;
 
-assignment: variable ASSIGN (value | func_call | func_io_call | expression);
+assignment: variable ASSIGN (func_call | func_io_call | value | memory_expr);
 declaration: IDENTIFIER COLON type SEMICOLON;
 return_stmt: RETURN value?;
 statement: (assignment | func_call | func_io_call | return_stmt) SEMICOLON;
@@ -42,24 +42,28 @@ pre_expr: (INC | DEC) variable;
 memory_expr: (INC INC | DEC DEC) variable; // NOTE: never heard of this, does that exist in any language?
 
 comp_expr: LPAREN comp_expr RPAREN
-    | numeric_value relational_ops numeric_value
-    | value equality_ops value;
+    | math_expr relational_ops math_expr
+    | math_expr equality_ops math_expr;
 logic_expr: LPAREN logic_expr RPAREN
     | NOT logic_expr
     | comp_expr
     | logic_expr AND logic_expr
     | logic_expr OR logic_expr
-//    | func_call
-//    | variable
-    | boolean_value;
+    | func_call
+    | variable
+    | TRUE
+    | FALSE;
 math_expr: LPAREN math_expr RPAREN
     | post_expr
     | pre_expr
     | (ADD | SUB) math_expr
     | math_expr multiplicative_ops math_expr
     | math_expr additive_ops math_expr
-    | numeric_value;
-expression: memory_expr | math_expr | logic_expr;
+    | func_call
+    | func_io_call
+    | variable
+    | array_size
+    | NUMBER;
 
 block: LBRACE
     (block | condition | loop | statement)*
