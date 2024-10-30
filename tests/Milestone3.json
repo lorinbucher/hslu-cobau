@@ -1,0 +1,1779 @@
+{
+    "name"                  : "Semantic Analysis",
+    "commandline"           : "${jvm} -jar ${buildDir}/libs/MiniJCompiler.jar",
+    "description"           : "A set of system tests to verify, whether the compiler is able to perform a semantic analysis of a miniJ program",
+    "startScore"            : -30,
+    "timeoutMilliseconds"   : 3000,
+    "testCases" : [
+    {
+        "name"             : "(Deklaration) Globale Variablen (ok)",
+        "input"            : "number1 : integer;\nnumber2 : integer;",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 2.4
+    },
+    {
+        "name"             : "(Deklaration) Variablen (ok)",
+        "input"            : "fun main() : integer {\n    text1 : string;\n    text2 : string;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 2.4
+    },
+    {
+        "name"             : "(Deklaration) Prozedur (ok)",
+        "input"            : "fun test1() {\n}\nfun test2() {\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 2.4
+    },
+    {
+        "name"             : "(Deklaration) Felder (ok)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 2.4
+    },
+    {
+        "name"             : "(Deklaration) structs (ok)",
+        "input"            : "struct Coordinate1 {\n    x : integer;\n    y : integer;\n}\nstruct Coordinate2 {\n    x : integer;\n    y : integer;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 2.4
+    },
+    {
+        "name"             : "(Deklaration) Globale Variablen (nok)",
+        "input"            : "number : integer;\nnumber : integer;",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 1.5
+    },
+    {
+        "name"             : "(Deklaration) Variablen (nok)",
+        "input"            : "fun main() : integer {\n    text1 : string;\n    text1 : string;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 1.5
+    },
+    {
+        "name"             : "(Deklaration) Prozedur (nok)",
+        "input"            : "fun test() {\n}\nfun test() {\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 1.5
+    },
+    {
+        "name"             : "(Deklaration) structs (nok)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nstruct Coordinate {\n    x : integer;\n    y : integer;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 1.5
+    },
+    {
+        "name"             : "(Deklaration) Felder (nok)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    x : integer;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 1.5
+    },
+    {
+        "name"             : "(Deklaration) Globale Variable mit void (nok)",
+        "input"            : "global : void;",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 1.5
+    },
+    {
+        "name"             : "(Deklaration) Variable mit void (nok)",
+        "input"            : "fun main() : integer {\n    local : void;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 1.5
+    },
+    {
+        "name"             : "(Deklaration) Struct mit void (nok)",
+        "input"            : "struct Coordinate2 {\n    feld : void;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 1.5
+    },
+    {
+        "name"             : "(Existenz) Variable",
+        "input"            : "fun main() : integer {\n    number : integer;\n    number = 0;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 1.3
+    },
+    {
+        "name"             : "(Existenz) Variable (nok)",
+        "input"            : "fun main() : integer {\n    number = 0;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.53
+    },
+    {
+        "name"             : "(Existenz) Globale Variable",
+        "input"            : "number : integer;\nfun main() : integer {\n    number = 0;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 1.3
+    },
+    {
+        "name"             : "(Existenz) Globale Variable (nok)",
+        "input"            : "fun main() : integer {\n    number = 0;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.53
+    },
+    {
+        "name"             : "(Existenz) Parameter",
+        "input"            : "fun test(mytext : string) {\n    mytext = \"Hello\";\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 1.4
+    },
+    {
+        "name"             : "(Existenz) Parameter (nok)",
+        "input"            : "fun test(mytext : string) {\n    greeting = \"Hello\";\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.54
+    },
+    {
+        "name"             : "(Existenz) struct",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate : Coordinate;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 1.3
+    },
+    {
+        "name"             : "(Existenz) struct (nok)",
+        "input"            : "fun main() : integer {\n    coordinate : Coordinate;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.53
+    },
+    {
+        "name"             : "(Existenz) Structfelder",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate : Coordinate;\n    coordinate->x = 1;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 1.3
+    },
+    {
+        "name"             : "(Existenz) Structfelder (nok)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate : Coordinate;\n    coordinate->z = 1;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.53
+    },
+    {
+        "name"             : "(Existenz) Prozedur",
+        "input"            : "fun test() {\n}\nfun main() : integer {\n    test();\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 1.4
+    },
+    {
+        "name"             : "(Existenz) Prozedur (nok)",
+        "input"            : "fun test() {\n}\nfun main() : integer {\n    ueberpruefung();\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.54
+    },
+    {
+        "name"             : "(Existenz) Falsche Entität (Global als Prozedur)",
+        "input"            : "number : integer;\nfun main() : integer {\n    number();\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.53
+    },
+    {
+        "name"             : "(Existenz) Falsche Entität (Struct als Prozedur)",
+        "input"            : "struct Coordinate {\n  x : integer;\n  y : integer;\n}\nfun main() : integer {\n    Coordinate();\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.53
+    },
+    {
+        "name"             : "(Existenz) Falsche Entität (Prozedur als Struct)",
+        "input"            : "fun test() {\n}\nfun main() : integer {\n    test->x = 0;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.54
+    },
+    {
+        "name"             : "(Existenz) Falsche Entität (Prozedur als Variable, LHS)",
+        "input"            : "fun test() {\n}\nfun main() : integer {\n    test = 42;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.53
+    },
+    {
+        "name"             : "(Existenz) Falsche Entität (Prozedur als Variable, RHS)",
+        "input"            : "fun test() {\n}\nfun main() : integer {\n    number : integer;\n    number = 2 * test;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.53
+    },
+    {
+        "name"             : "(Existenz) Falsche Entität (struct als Variable, LHS)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    Coordinate = 42;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.54
+    },
+    {
+        "name"             : "(Existenz) Falsche Entität (struct als Variable, RHS)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    number : integer;\n    number = 2 * Coordinate;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.53
+    },
+    {
+        "name"             : "(Existenz) Falsche Entität (Variable als Prozedur)",
+        "input"            : "fun main() : integer {\n   number : integer;\n   number();\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.53
+    },
+    {
+        "name"             : "(Existenz) Falsche Entität (Variable als Struct)",
+        "input"            : "fun main() : integer {\n   number : integer;\n   number->x = 1;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.54
+    },
+    {
+        "name"             : "(Bereich) Wertebereich von Integerkonstante (max)",
+        "input"            : "number : integer;\nfun main() : integer {\n    number = 9223372036854775807;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Bereich) Wertebereich von Integerkonstante (zu hoch)",
+        "input"            : "number : integer;\nfun main() : integer {\n    number = 9223372036854775808;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Bereich) Wertebereich von Integerkonstante (min)",
+        "input"            : "number : integer;\nfun main() : integer {\n    number = -9223372036854775808;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Bereich) Wertebereich von Integerkonstante (zu tief)",
+        "input"            : "number : integer;\nfun main() : integer {\n    number = -9223372036854775809;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Aufruf) Funktion mit 2 Parameter",
+        "input"            : "fun test(a : integer, b : integer) {\n}\nfun main() : integer {\n    number : integer;\n    test(1, number);\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Aufruf) Funktion mit 3 Parameter",
+        "input"            : "fun test(a : integer, b : integer, c : integer) {\n}\nfun main() : integer {\n    number : integer;\n    test(1, 2, number);\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Aufruf) Funktion mit Rückgabewert",
+        "input"            : "fun test() : integer {\n    return 42;\n}\nfun main() : integer {\n    number : integer;\n    number = test();\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Aufruf) Funktion mit Rückgabewert und Parameter",
+        "input"            : "fun test(a : integer, b : integer) : integer {\n    return 42;\n}\nfun main() : integer {\n    number : integer;\n    number = test(1, 2);\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Aufruf) Funktion mit 2 Parameter (nok)",
+        "input"            : "fun test(a : integer, b : integer) {\n}\nfun main() : integer {\n    number : integer;\n    test(1, number, 3);\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Aufruf) Funktion mit 3 Parameter (nok)",
+        "input"            : "fun test(a : integer, b : integer, c : integer) {\n}\nfun main() : integer {\n    number : integer;\n    test(1, number);\n    test(number);\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Aufruf) Funktion ohne den erwarteten Rückgabewert (nok)",
+        "input"            : "fun test() : integer {\n    return;\n}\nfun main() : integer {\n    number : integer;\n    number = test();\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Aufruf) Funktion mit unerwartetem Rückgabewert (nok)",
+        "input"            : "fun test(a : integer, b : integer) {\n    return 42;\n}\nfun main() : integer {\n    number : integer;\n    number = test(1, 2);\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Main) Mainprozedur ohne Parameter (ok)",
+        "input"            : "fun main() : integer {\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 1.0
+    },
+    {
+        "name"             : "(Main) Mainprozedur mit einem Parameter (nok)",
+        "input"            : "fun main(a : integer) : integer {\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Main) Mainprozedur mit zwei Parameter (nok)",
+        "input"            : "fun main(a : integer, b : string) : integer {\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.5
+    },
+    {
+        "name"             : "(Built-in) writeInt,readInt,writeChar,readChar",
+        "input"            : "fun main() : integer {\n    number : integer;\n    writeInt(number);\n    number = readInt();\n    writeChar(number);\n    number = readChar();\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 1.0
+    },
+    {
+        "name"             : "(Built-in) writeInt,readInt,writeChar,readChar",
+        "input"            : "fun main() : integer {\n    number : integer;\n    if (1 == 1) {\n        writeInt(number);\n        number = readInt();\n        writeChar(number);\n        number = readChar();\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 1.0
+    },
+    {
+        "name"             : "(Built-in) writeInt (nok)",
+        "input"            : "fun main() : integer {\n    number : integer;\n    writeInt();\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "(Built-in) readInt (nok)",
+        "input"            : "fun main() : integer {\n    number : integer;\n    readInt(number, number);\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "(Built-in) writeChar (nok)",
+        "input"            : "fun main() : integer {\n    mytext : string;\n    writeChar(mytext);\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "(Built-in) readChar (nok)",
+        "input"            : "fun main() : integer {\n    readChar(1, 1, 1);\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "(Built-in) writeInt,readInt,writeChar,readChar (nok)",
+        "input"            : "fun main() : integer {\n    number : integer;\n    if (1 == 1) {\n        writeInt(\"string\");\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.4
+    },
+    {
+        "name"             : "(Typ) Zuweisung von Integerkonstante",
+        "input"            : "number : integer;\nfun main() : integer {\n    number = 0;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.125
+    },
+    {
+        "name"             : "(Typ) Zuweisung von Integerkonstante (nok)",
+        "input"            : "mytext : string;\nfun main() : integer {\n    mytext = 0;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.125
+    },
+    {
+        "name"             : "(Typ) Zuweisung von Stringkonstante",
+        "input"            : "mytext : string;\nfun main() : integer {\n    mytext = \"xyz\";\n    mytext = \"\";\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.125
+    },
+    {
+        "name"             : "(Typ) Zuweisung von Stringkonstante (nok)",
+        "input"            : "number : integer;\nfun main() : integer {\n    number = \"xyz\";\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.125
+    },
+    {
+        "name"             : "(Typ) Zuweisung von Wahrheitswert",
+        "input"            : "flag : boolean;\nfun main() : integer {\n    flag = true;\n    flag = false;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.125
+    },
+    {
+        "name"             : "(Typ) Zuweisung von Wahrheitswert (nok)",
+        "input"            : "number : integer;\nfun main() : integer {\n    number = true;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.0625
+    },
+    {
+        "name"             : "(Typ) Zuweisung von Wahrheitswert (nok)",
+        "input"            : "number : integer;\nfun main() : integer {\n    number = false;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.0625
+    },
+    {
+        "name"             : "(Typ) If-Anweisung mit Bedingung vom Typ boolean",
+        "input"            : "fun main() : integer {\n    flag : boolean;\n    if (flag) {\n        return 0;\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.125
+    },
+    {
+        "name"             : "(Typ) If-Anweisung mit Bedingung vom Typ integer (nok)",
+        "input"            : "fun main() : integer {\n   flag : integer;\n   if (flag) {\n       return 0;\n   }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.03125
+    },
+    {
+        "name"             : "(Typ) If-Anweisung mit Bedingung vom Typ string (nok)",
+        "input"            : "fun main() : integer {\n    flag : string;\n    if (flag) {\n        return 0;\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.03125
+    },
+    {
+        "name"             : "(Typ) If-Anweisung mit Bedingung vom Typ integer[] (nok)",
+        "input"            : "fun main() : integer {\n    flag : integer[];\n    if (flag[0]) {\n        return 0;\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.03125
+    },
+    {
+        "name"             : "(Typ) If-Anweisung mit Bedingung vom Typ struct (nok)",
+        "input"            : "struct Coordinate {\n  x : integer;\n  y : integer;\n}\nfun main() : integer {\n    flag : Coordinate;\n    if (flag) {\n        return 0;\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.03125
+    },
+    {
+        "name"             : "(Typ) While-Anweisung mit Bedingung vom Typ boolean",
+        "input"            : "fun main() : integer {\n    flag : boolean;\n    while (flag) {\n        return 0;\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.125
+    },
+    {
+        "name"             : "(Typ) While-Anweisung mit Bedingung vom Typ integer (nok)",
+        "input"            : "fun main() : integer {\n    flag : integer;\n    while (flag) {\n        return 0;\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.03125
+    },
+    {
+        "name"             : "(Typ) While-Anweisung mit Bedingung vom Typ string (nok)",
+        "input"            : "fun main() : integer {\n    flag : string;\n    while (flag) {\n        return 0;\n   }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.03125
+    },
+    {
+        "name"             : "(Typ) While-Anweisung mit Bedingung vom Typ Array (nok)",
+        "input"            : "fun main() : integer {\n    flag : integer[];\n    while (flag[0]) {\n        return 0;\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.03125
+    },
+    {
+        "name"             : "(Typ) While-Anweisung mit Bedingung vom Typ struct (nok)",
+        "input"            : "struct Coordinate {\n  x : integer;\n  y : integer;\n}\nfun main() : integer {\n    flag : Coordinate;\n    while (flag) {\n        return 0;\n   }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.03125
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (integer, ok)",
+        "input"            : "fun main() : integer {\n    flag : boolean;\n    number1 : integer;\n    number2 : integer;\n    flag = number1 == number2;\n    flag = number1 >= number2;\n    flag = number1 <= number2;\n    flag = number1 != number2;\n    flag = number1 > number2;\n    flag = number1 < number2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.125
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (integer, nok ==)",
+        "input"            : "fun main() : integer {\n    flag : integer;\n    number1 : integer;\n    number2 : integer;\n    flag = number1 == number2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (integer, nok !=)",
+        "input"            : "fun main() : integer {\n    flag : integer;\n    number1 : integer;\n    number2 : integer;\n    flag = number1 != number2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (integer, nok <=)",
+        "input"            : "fun main() : integer {\n    flag : integer;\n    number1 : integer;\n    number2 : integer;\n    flag = number1 <= number2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (integer, nok >=)",
+        "input"            : "fun main() : integer {\n    flag : integer;\n    number1 : integer;\n    number2 : integer;\n    flag = number1 >= number2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (integer, nok >)",
+        "input"            : "fun main() : integer {\n    flag : integer;\n    number1 : integer;\n    number2 : integer;\n    flag = number1 > number2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (integer, nok <)",
+        "input"            : "fun main() : integer {\n    flag : integer;\n    number1 : integer;\n    number2 : integer;\n    flag = number1 < number2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.025
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (string, ok)",
+        "input"            : "fun main() : integer {\n    flag : boolean;\n    value1 : string;\n    value2 : string;\n    flag = value1 == value2;\n    flag = value1 >= value2;\n    flag = value1 <= value2;\n    flag = value1 != value2;\n    flag = value1 > value2;\n    flag = value1 < value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.125
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (string, nok ==)",
+        "input"            : "fun main() : integer {\n    flag : string;\n    value1 : string;\n    value2 : string;\n    flag = value1 == value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (string, nok !=)",
+        "input"            : "fun main() : integer {\n    flag : string;\n    value1 : string;\n    value2 : string;\n    flag = value1 != value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (string, nok <=)",
+        "input"            : "fun main() : integer {\n    flag : integer;\n    value1 : string;\n    value2 : string;\n    flag = value1 <= value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (string, nok >=)",
+        "input"            : "fun main() : integer {\n    flag : integer;\n    value1 : string;\n    value2 : string;\n    flag = value1 >= value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (string, nok >)",
+        "input"            : "fun main() : integer {\n    flag : integer;\n    value1 : string;\n    value2 : string;\n    flag = value1 > value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (string, nok <)",
+        "input"            : "fun main() : integer {\n    flag : integer;\n    value1 : string;\n    value2 : string;\n    flag = value1 < value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.025
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (boolean, ok)",
+        "input"            : "fun main() : integer {\n    flag : boolean;\n    value1 : boolean;\n    value2 : boolean;\n    flag = value1 == value2;\n    flag = value1 != value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.125
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (boolean, nok)",
+        "input"            : "fun main() : integer {\n    flag : boolean;\n    value1 : boolean;\n    value2 : boolean;\n    flag = value1 >= value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.03125
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (boolean, nok)",
+        "input"            : "fun main() : integer {\n    flag : boolean;\n    value1 : boolean;\n    value2 : boolean;\n    flag = value1 <= value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.03125
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (boolean, nok)",
+        "input"            : "fun main() : integer {\n    flag : boolean;\n    value1 : boolean;\n    value2 : boolean;\n    flag = value1 > value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.03125
+    },
+    {
+        "name"             : "(Typ) Vergleich mit Boolean Resultat (boolean, nok)",
+        "input"            : "fun main() : integer {\n    flag : boolean;\n    value1 : boolean;\n    value2 : boolean;\n    flag = value1 < value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.03125
+    },
+    {
+        "name"             : "(Typ) Zuweisung (integer vs. integer)",
+        "input"            : "fun main() : integer {\n    number1 : integer;\n    number2 : integer;\n    number1 = number2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (integer vs. boolean)",
+        "input"            : "fun main() : integer {\n    number1 : integer;\n    flag2 : boolean;\n    number1 = flag2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (integer vs. string)",
+        "input"            : "fun main() : integer {\n    number1 : integer;\n    text2 : string;\n    number1 = text2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (integer vs. struct)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    number1 : integer;\n    coord2 : Coordinate;\n    number1 = coord2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (integer vs. struct-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    number1 : integer;\n    coord2 : Coordinate;\n    number1 = coord2->x;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (integer vs. Intarray)",
+        "input"            : "fun main() : integer {\n    number1 : integer;\n    array2 : integer[];\n    number1 = array2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (integer vs. Structarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    number1 : integer;\n    coordinate2 : Coordinate[];\n    number1 = coordinate2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (integer vs. Intarray-Field)",
+        "input"            : "fun main() : integer {\n    number1 : integer;\n    array2 : integer[];\n    number1 = array2[0];\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (integer vs. Structarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    number1 : integer;\n    coordinate2 : Coordinate[];\n    number1 = coordinate2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (boolean vs. Intarray)",
+        "input"            : "fun main() : integer {\n    flag1 : boolean;\n    number2 : integer;\n    flag1 = number2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (boolean vs. boolean)",
+        "input"            : "fun main() : integer {\n    flag1 : boolean;\n    flag2 : boolean;\n    flag1 = flag2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (boolean vs. string)",
+        "input"            : "fun main() : integer {\n    flag1 : boolean;\n    text2 : string;\n    flag1 = text2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (boolean vs. Struct)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    flag1 : boolean;\n    coord2 : Coordinate;\n    flag1 = coord2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (boolean vs. Struct-Field(integer))",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    flag1 : boolean;\n    coord2 : Coordinate;\n    flag1 = coord2->x;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (boolean vs. Intarray)",
+        "input"            : "fun main() : integer {\n    flag1 : boolean;\n    array2 : integer[];\n    flag1 = array2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (boolean vs. Structarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    flag1 : boolean;\n    coordinate2 : Coordinate[];\n    flag1 = coordinate2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (boolean vs. Intarray-Field)",
+        "input"            : "fun main() : integer {\n    flag1 : boolean;\n    array2 : integer[];\n    flag1 = array2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (boolean vs. Structarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    flag1 : boolean;\n    coordinate2 : Coordinate[];\n    flag1 = coordinate2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (string vs. integer)",
+        "input"            : "fun main() : integer {\n    text1 : string;\n    number2 : integer;\n    text1 = number2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (string vs. boolean)",
+        "input"            : "fun main() : integer {\n    text1 : string;\n    flag2 : boolean;\n    text1 = flag2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (string vs. string)",
+        "input"            : "fun main() : integer {\n    text1 : string;\n    text2 : string;\n    text1 = text2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (string vs. Struct)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    text1 : string;\n    coord2 : Coordinate;\n    text1 = coord2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (string vs. Struct-Field(integer))",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    text1 : string;\n    coord2 : Coordinate;\n    text1 = coord2->x;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (string vs. Intarray)",
+        "input"            : "fun main() : integer {\n    text1 : string;\n    array2 : integer[];\n    text1 = array2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (string vs. Structarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    text1 : string;\n    coordinate2 : Coordinate[];\n    text1 = coordinate2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.015
+    },
+    {
+        "name"             : "(Typ) Zuweisung (string vs. Intarray-Field)",
+        "input"            : "fun main() : integer {\n    text1 : string;\n    array2 : integer[];\n    text1 = array2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (string vs. Structarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    text1 : string;\n    coordinate2 : Coordinate[];\n    text1 = coordinate2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct vs. integer)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    number2 : integer;\n    coord1 = number2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct vs. boolean)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    flag2 : boolean;\n    coord1 = flag2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct vs. string)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    text2 : string;\n    coord1 = text2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct vs. struct)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    coord2 : Coordinate;\n    coord1 = coord2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct vs. struct-Field(integer))",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    coord2 : Coordinate;\n    coord1 = coord2->x;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct vs. Intarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    array2 : integer[];\n    coord1 = array2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct vs. structarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    coordinate2 : Coordinate[];\n    coord1 = coordinate2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct vs. Intarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    array2 : integer[];\n    coord1 = array2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct vs. structarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    coordinate2 : Coordinate[];\n    coord1 = coordinate2[0];\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct-Field(integer) vs. integer)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    number2 : integer;\n    coord1->x = number2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct-Field(integer) vs. boolean)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    flag2 : boolean;\n    coord1->x = flag2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct-Field(integer) vs. string)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    text2 : string;\n    coord1->x = text2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct-Field(integer) vs. struct)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    coord2 : Coordinate;\n    coord1->x = coord2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct-Field(integer) vs. struct-Field(integer))",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    coord2 : Coordinate;\n    coord1->x = coord2->x;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct-Field(integer) vs. Intarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    array2 : integer[];\n    coord1->x = array2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct-Field(integer) vs. structarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    coordinate2 : Coordinate[];\n    coord1->x = coordinate2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct-Field(integer) vs. Intarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    array2 : integer[];\n    coord1->x = array2[0];\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (struct-Field(integer) vs. structarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord1 : Coordinate;\n    coordinate2 : Coordinate[];\n    coord1->x = coordinate2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray vs. integer)",
+        "input"            : "fun main() : integer {\n    array1 : integer[];\n    number2 : integer;\n    array1 = number2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray vs. boolean)",
+        "input"            : "fun main() : integer {\n    array1 : integer[];\n    flag2 : boolean;\n    array1 = flag2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray vs. string)",
+        "input"            : "fun main() : integer {\n    array1 : integer[];\n    text2 : string;\n    array1 = text2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray vs. struct)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    array1 : integer[];\n    coord2 : Coordinate;\n    array1 = coord2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray vs. struct-Field(integer))",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    array1 : integer[];\n    coord2 : Coordinate;\n    array1 = coord2->x;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray vs. Intarray)",
+        "input"            : "fun main() : integer {\n    array1 : integer[];\n    array2 : integer[];\n    array1 = array2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray vs. structarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    array1 : integer[];\n    coordinate2 : Coordinate[];\n    array1 = coordinate2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray vs. Intarray-Field)",
+        "input"            : "fun main() : integer {\n    array1 : integer[];\n    array2 : integer[];\n    array1 = array2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray vs. structarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    array1 : integer[];\n    coordinate2 : Coordinate[];\n    array1 = coordinate2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray vs. integer)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    number2 : integer;\n    coordinate1 = number2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray vs. boolean)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    flag2 : boolean;\n    coordinate1 = flag2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray vs. string)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    text2 : string;\n    coordinate1 = text2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray vs. struct)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    coord2 : Coordinate;\n    coordinate1 = coord2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray vs. struct-Field(integer))",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    coord2 : Coordinate;\n    coordinate1 = coord2->x;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray vs. Intarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    array2 : integer[];\n    coordinate1 = array2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray vs. structarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    coordinate2 : Coordinate[];\n    coordinate1 = coordinate2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray vs. Intarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    array2 : integer[];\n    coordinate1 = array2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray vs. structarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    coordinate2 : Coordinate[];\n    coordinate1 = coordinate2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray-Field vs. integer)",
+        "input"            : "fun main() : integer {\n    array1 : integer[];\n    number2 : integer;\n    array1[0] = number2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray-Field vs. boolean)",
+        "input"            : "fun main() : integer {\n    array1 : integer[];\n    flag2 : boolean;\n    array1[0] = flag2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray-Field vs. string)",
+        "input"            : "fun main() : integer {\n    array1 : integer[];\n    text2 : string;\n    array1[0] = text2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray-Field vs. struct)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    array1 : integer[];\n    coord2 : Coordinate;\n    array1[0] = coord2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray-Field vs. struct-Field(integer))",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    array1 : integer[];\n    coord2 : Coordinate;\n    array1[0] = coord2->x;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray-Field vs. Intarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    array1 : integer[];\n    array2 : integer[];\n    array1[0] = array2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray-Field vs. structarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    array1 : integer[];\n    coordinate2 : Coordinate[];\n    array1[0] = coordinate2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray-Field vs. Intarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    array1 : integer[];\n    array2 : integer[];\n    array1[0] = array2[0];\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.06
+    },
+    {
+        "name"             : "(Typ) Zuweisung (Intarray-Field vs. structarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    array1 : integer[];\n    coordinate2 : Coordinate[];\n    array1[0] = coordinate2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray-Field vs. integer)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    number2 : integer;\n    coordinate1[0] = number2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray-Field vs. boolean)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    flag2 : boolean;\n    coordinate1[0] = flag2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray-Field vs. string)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    text2 : string;\n    coordinate1[0] = text2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray-Field vs. struct)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    coord2 : Coordinate;\n    coordinate1[0] = coord2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray-Field vs. struct-Field(integer))",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    coord2 : Coordinate;\n    coordinate1[0] = coord2->x;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray-Field vs. Intarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    array2 : integer[];\n    coordinate1[0] = array2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray-Field vs. structarray)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    coordinate2 : Coordinate[];\n    coordinate1[0] = coordinate2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray-Field vs. Intarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    array2 : integer[];\n    coordinate1[0] = array2[0];\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.016
+    },
+    {
+        "name"             : "(Typ) Zuweisung (structarray-Field vs. structarray-Field)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coordinate1 : Coordinate[];\n    coordinate2 : Coordinate[];\n    coordinate1[0] = coordinate2[0];\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, +)",
+        "input"            : "fun main() : integer {\n    value1 : integer;\n    value2 : integer;\n    value1 = value1 + value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.03
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, +)",
+        "input"            : "fun main() : integer {\n    value1 : string;\n    value2 : string;\n    value1 = value1 + value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, +)",
+        "input"            : "fun main() : integer {\n    value1 : boolean;\n    value2 : boolean;\n    value1 = value1 + value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, +)",
+        "input"            : "fun main() : integer {\n    value1 : integer[];\n    value2 : integer[];\n    value1 = value1 + value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, +)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    value1 : Coordinate;\n    value2 : Coordinate;\n    value1 = value1 + value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, -)",
+        "input"            : "fun main() : integer {\n    value1 : integer;\n    value2 : integer;\n    value1 = value1 - value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, -)",
+        "input"            : "fun main() : integer {\n    value1 : string;\n    value2 : string;\n    value1 = value1 - value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, -)",
+        "input"            : "fun main() : integer {\n    value1 : boolean;\n    value2 : boolean;\n    value1 = value1 - value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, -)",
+        "input"            : "fun main() : integer {\n    value1 : integer[];\n    value2 : integer[];\n    value1 = value1 - value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, -)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    value1 : Coordinate;\n    value2 : Coordinate;\n    value1 = value1 - value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, *)",
+        "input"            : "fun main() : integer {\n    value1 : integer;\n    value2 : integer;\n    value1 = value1 * value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.03
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, *)",
+        "input"            : "fun main() : integer {\n    value1 : string;\n    value2 : string;\n    value1 = value1 * value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, *)",
+        "input"            : "fun main() : integer {\n    value1 : boolean;\n    value2 : boolean;\n    value1 = value1 * value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, *)",
+        "input"            : "fun main() : integer {\n    value1 : integer[];\n    value2 : integer[];\n    value1 = value1 * value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, *)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    value1 : Coordinate;\n    value2 : Coordinate;\n    value1 = value1 * value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, div)",
+        "input"            : "fun main() : integer {\n    value1 : integer;\n    value2 : integer;\n    value1 = value1 / value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, div)",
+        "input"            : "fun main() : integer {\n    value1 : string;\n    value2 : string;\n    value1 = value1 / value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, div)",
+        "input"            : "fun main() : integer {\n    value1 : boolean;\n    value2 : boolean;\n    value1 = value1 / value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, div)",
+        "input"            : "fun main() : integer {\n    value1 : integer[];\n    value2 : integer[];\n    value1 = value1 / value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, div)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    value1 : Coordinate;\n    value2 : Coordinate;\n    value1 = value1 / value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, %)",
+        "input"            : "fun main() : integer {\n    value1 : integer;\n    value2 : integer;\n    value1 = value1 % value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, %)",
+        "input"            : "fun main() : integer {\n    value1 : string;\n    value2 : string;\n    value1 = value1 % value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, %)",
+        "input"            : "fun main() : integer {\n    value1 : boolean;\n    value2 : boolean;\n    value1 = value1 % value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, %)",
+        "input"            : "fun main() : integer {\n    value1 : integer[];\n    value2 : integer[];\n    value1 = value1 % value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, %)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    value1 : Coordinate;\n    value2 : Coordinate;\n    value1 = value1 % value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, ==)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer;\n    value2 : integer;\n    res = value1 == value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, ==)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : string;\n    value2 : string;\n    res = value1 == value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, ==)",
+        "input"            : "fun main() : integer {\n    value1 : boolean;\n    value2 : boolean;\n    res : boolean;\n    res = value1 == value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, ==)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer[];\n    value2 : integer[];\n    res = value1 == value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, ==)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    res : boolean;\n    value1 : Coordinate;\n    value2 : Coordinate;\n    res = value1 == value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, !=)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer;\n    value2 : integer;\n    res = value1 != value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, !=)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : string;\n    value2 : string;\n    res = value1 != value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, !=)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : boolean;\n    value2 : boolean;\n    res = value1 != value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, !=)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer[];\n    value2 : integer[];\n    res = value1 != value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, !=)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    res : boolean;\n    value1 : Coordinate;\n    value2 : Coordinate;\n    res = value1 != value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, >=)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer;\n    value2 : integer;\n    res = value1 >= value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, >=)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : string;\n    value2 : string;\n    res = value1 >= value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, >=)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : boolean;\n    value2 : boolean;\n    res = value1 >= value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, >=)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer[];\n    value2 : integer[];\n    res = value1 >= value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, >=)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    res : boolean;\n    value1 : Coordinate;\n    value2 : Coordinate;\n    res = value1 >= value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, <=)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer;\n    value2 : integer;\n    res = value1 <= value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.03
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, <=)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : string;\n    value2 : string;\n    res = value1 <= value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, <=)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : boolean;\n    value2 : boolean;\n    res = value1 <= value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, <=)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer[];\n    value2 : integer[];\n    res = value1 <= value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, <=)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    res : boolean;\n    value1 : Coordinate;\n    value2 : Coordinate;\n    res = value1 <= value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, >)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer;\n    value2 : integer;\n    res = value1 > value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, >)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : string;\n    value2 : string;\n    res = value1 > value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, >)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : boolean;\n    value2 : boolean;\n    res = value1 > value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, >)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer[];\n    value2 : integer[];\n    res = value1 > value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, >)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    res : boolean;\n    value1 : Coordinate;\n    value2 : Coordinate;\n    res = value1 > value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, <)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer;\n    value2 : integer;\n    res = value1 < value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.03
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, <)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : string;\n    value2 : string;\n    res = value1 < value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, <)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : boolean;\n    value2 : boolean;\n    res = value1 < value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, <)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer[];\n    value2 : integer[];\n    res = value1 < value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, <)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    res : boolean;\n    value1 : Coordinate;\n    value2 : Coordinate;\n    res = value1 < value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, ||)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer;\n    value2 : integer;\n    res = value1 || value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, ||)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : boolean;\n    value2 : boolean;\n    res = value1 || value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, ||)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer[];\n    value2 : integer[];\n    res = value1 || value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, ||)",
+        "input"            : "struct Coordinate {\n    res : boolean;\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    value1 : Coordinate;\n    value2 : Coordinate;\n    res = value1 || value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, &&)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer;\n    value2 : integer;\n    res = value1 && value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, &&)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : string;\n    value2 : string;\n    res = value1 && value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, &&)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : boolean;\n    value2 : boolean;\n    res = value1 && value2;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, &&)",
+        "input"            : "fun main() : integer {\n    res : boolean;\n    value1 : integer[];\n    value2 : integer[];\n    res = value1 && value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, &&)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    res : boolean;\n    value1 : Coordinate;\n    value2 : Coordinate;\n    res = value1 && value2;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, !)",
+        "input"            : "fun main() : integer {\n    value : integer;\n    value = !value;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, !)",
+        "input"            : "fun main() : integer {\n    value : string;\n    value = !value;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, !)",
+        "input"            : "fun main() : integer {\n    value : boolean;\n    value = !value;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, !)",
+        "input"            : "fun main() : integer {\n    value : integer[];\n    value = !value;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, !)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    value : Coordinate;\n    value = !value;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (integer, -)",
+        "input"            : "fun main() : integer {\n    value : integer;\n    value = -value;\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.05
+    },
+    {
+        "name"             : "(Typ) Operatoren (string, -)",
+        "input"            : "fun main() : integer {\n    value : string;\n    value = -value;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (boolean, -)",
+        "input"            : "fun main() : integer {\n    value : boolean;\n    value = -value;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (Array, -)",
+        "input"            : "fun main() : integer {\n    value : integer[];\n    value = -value;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Operatoren (struct, -)",
+        "input"            : "struct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    value : Coordinate;\n    value = -value;\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.02
+    },
+    {
+        "name"             : "(Typ) Funktionsaufruf (Parametertypen ok)",
+        "input"            : "fun test(a : integer) {\n}\nfun main() : integer {\n    number : integer;\n    test(1);\n    test(number);\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.33
+    },
+    {
+        "name"             : "(Typ) Funktionsaufruf (Parametertypen ok)",
+        "input"            : "fun testABC(a : integer[], b : string) {\n}\nfun main() : integer {\n    arr : integer[];\n    testABC(arr, \"abc\");\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.33
+    },
+    {
+        "name"             : "(Typ) Funktionsaufruf (Parametertypen ok)",
+        "input"            : "fun test(a : integer[], b : string) {\n}\nfun main() : integer {\n    arr : integer[];\n    while(1 == 1) {\n        test(arr, \"abc\");\n    }\n}",
+        "expectedExitCode" : "0",
+        "expectedOutput"   : "",
+        "score"            : 0.34
+    },
+    {
+        "name"             : "(Typ) Funktionsaufruf (Parametertypen falsch)",
+        "input"            : "fun test1(a : integer) {\n}\nfun main() : integer {\n    number : integer;\n    test1(\"Hallo\");\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.33
+    },
+    {
+        "name"             : "(Typ) Funktionsaufruf (Parametertypen falsch)",
+        "input"            : "fun test2(s : string, a : integer[]) {\n}\nstruct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord : Coordinate;\n    test2(\"abc\", coord);\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.33
+    },
+    {
+        "name"             : "(Typ) Funktionsaufruf (Parametertypen falsch)",
+        "input"            : "fun test2(number : integer, number : integer, a : integer[]) {\n}\nstruct Coordinate {\n    x : integer;\n    y : integer;\n}\nfun main() : integer {\n    coord : Coordinate;\n    if (1 == 1) {\n        test2(23, 42, coord);\n    }\n}",
+        "expectedExitCode" : "1",
+        "expectedOutput"   : "",
+        "score"            : 0.34
+    }  ]
+}

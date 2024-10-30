@@ -1,147 +1,152 @@
+/**
+ * Reference grammar for language "MiniJ HS24"
+ *
+ * Copyright (c) 2020-2024 HSLU Informatik. All rights reserved.
+ * This code and any derivative work thereof must remain private.
+ * Public distribution is prohibited.
+ */
 grammar MiniJ;
 
 @header {
 package ch.hslu.cobau.minij;
 }
 
-// milestone 2: parser
+///////////////////////////////////////////////////////////////////////////////
+// Parsing rules
+///////////////////////////////////////////////////////////////////////////////
 
-// parser rules
-unit : (declaration | function | struct)* EOF;
+// declaractions
+unit        : member* EOF;
+member      : declaration | struct | function | SEMICOLON;
 
-// operators
-multiplicative_ops: MUL | DIV | MOD;
-additive_ops: ADD | SUB;
-relational_ops: GREATER | LOWER | GEQUAL | LEQUAL;
-equality_ops: EQUAL | NOTEQUAL;
+struct      : STRUCT identifier LBRACE (declaration)* RBRACE;
 
-// values
-array_size: IDENTIFIER ACCESS SIZE;
-boolean_value: TRUE | FALSE | variable | func_call | comp_expr | logic_expr;
-numeric_value: NUMBER | array_size | variable | func_call | func_io_call | math_expr;
-value: TEXT | variable | func_call | func_io_call | numeric_value | boolean_value;
-type: type (LBRACK RBRACK) | (BOOLEAN | INTEGER | STRING | IDENTIFIER);
+// procedures and blocks
+function      : FUNCTION identifier LPAREN (parameter (COMMA parameter)*)?  RPAREN (COLON type)? declarations functionBody;
+parameter     : (REF)? identifier COLON type;
+declarations  : (declarationStatement)*;
 
-// structured data types
-array_variable: IDENTIFIER (LBRACK numeric_value RBRACK)+;
-struct_variable: IDENTIFIER ACCESS variable;
-variable: IDENTIFIER | array_variable | struct_variable;
-
-// function
-func_builtin: READINT | WRITEINT | READCHAR | WRITECHAR;
-func_call: IDENTIFIER func_call_arg_list;
-func_call_arg_list: LPAREN (value (COMMA value)*)? RPAREN;
-func_param: OUT? IDENTIFIER COLON type;
-func_param_list: LPAREN (func_param (COMMA func_param)*)? RPAREN;
-func_return_type: COLON type;
-func_io_call: func_builtin LPAREN numeric_value? RPAREN;
+functionBody  : LBRACE (declarationStatement)* (statement)* RBRACE;
+block         : LBRACE (statement)* RBRACE;
 
 // statements
-assignment: variable ASSIGN (func_call | func_io_call | value | memory_expr);
-declaration: IDENTIFIER COLON type SEMICOLON;
-return_stmt: RETURN value?;
-statement: (assignment | func_call | func_io_call | return_stmt) SEMICOLON;
+declarationStatement : declaration | SEMICOLON;
+statement            : assignment | callStatement | returnStatement | ifStatement | whileStatement | block | SEMICOLON;
+
+assignment           : memoryAccess ASSIGN expression SEMICOLON;
+callStatement        : call SEMICOLON;
+whileStatement       : WHILE LPAREN expression RPAREN statement;
+ifStatement          : IF LPAREN expression RPAREN statement (elseClause)?;
+elseClause           : ELSE statement;
+returnStatement      : RETURN (expression)? SEMICOLON;
 
 // expressions
-post_expr: variable (INC | DEC);
-pre_expr: (INC | DEC) variable;
-memory_expr: (INC INC | DEC DEC) variable; // NOTE: never heard of this, does that exist in any language?
-comp_expr: LPAREN comp_expr RPAREN
-    | math_expr relational_ops math_expr
-    | (TEXT | math_expr) equality_ops (TEXT | math_expr);
-logic_expr: LPAREN logic_expr RPAREN
-    | NOT logic_expr
-    | comp_expr
-    | logic_expr AND logic_expr
-    | logic_expr OR logic_expr
-    | func_call
-    | variable
-    | TRUE
-    | FALSE;
-math_expr: LPAREN math_expr RPAREN
-    | post_expr
-    | pre_expr
-    | (ADD | SUB) math_expr
-    | math_expr multiplicative_ops math_expr
-    | math_expr additive_ops math_expr
-    | func_call
-    | func_io_call
-    | variable
-    | array_size
-    | NUMBER;
+// NOTE: The order of the following subrules is important. In ANTLR order reflects the associativity
+//       of the operations. Thus, operator with highest precendence MUST be listed first.
+expression : LPAREN expression RPAREN
+           | memoryAccess (INCREMENT | DECREMENT)
+           | unaryExpression
+           | expression binaryOp=(TIMES | DIV | MOD) expression
+           | expression binaryOp=(PLUS | MINUS) expression
+           | expression binaryOp=(LESSER | GREATER | LESSER_EQ | GREATER_EQ) expression
+           | expression binaryOp=(EQUAL | UNEQUAL) expression
+           | expression binaryOp=AND expression
+           | expression binaryOp=OR expression
+           | call
+           | trueConstant
+           | falseConstant
+           | integerConstant
+           | stringConstant
+           | memoryAccess
+           ;
 
-// (control) structures
-block: LBRACE
-    (block | condition | loop | statement)*
-    RBRACE SEMICOLON?;
-condition: IF LPAREN boolean_value RPAREN
-    (block | statement)
-    (ELSE IF LPAREN boolean_value RPAREN (block | statement))*
-    (ELSE (block | statement))?;
-function: FUNCTION IDENTIFIER func_param_list func_return_type? LBRACE
-    declaration*
-    (block | condition | loop | statement)*
-    RBRACE SEMICOLON?;
-loop: WHILE LPAREN boolean_value RPAREN (block | statement);
-struct: STRUCT IDENTIFIER LBRACE declaration* RBRACE;
+call       : identifier LPAREN (expression (COMMA expression)*)? RPAREN;
+
+unaryExpression : unaryOp=(NOT | MINUS | PLUS | INCREMENT | DECREMENT) expression;
+trueConstant    : TRUE;
+falseConstant   : FALSE;
+integerConstant : INTEGER;
+stringConstant  : STRINGCONSTANT;
+memoryAccess    : ID
+                | memoryAccess ARROW SIZE
+                | memoryAccess ARROW ID
+                | memoryAccess LBRACKET expression RBRACKET
+                ;
+
+// types and identifier
+declaration   : identifier COLON type SEMICOLON;
+type          : basicType | type LBRACKET RBRACKET;
+basicType     : integerType | booleanType | stringType | structType;
+integerType   : INT;
+stringType    : STRING;
+booleanType   : BOOLEAN;
+structType    : identifier;
+
+identifier    : ID;
+
+///////////////////////////////////////////////////////////////////////////////
+// Lexer rules
+///////////////////////////////////////////////////////////////////////////////
+
+// operators, blocks, arrays indexes, and parameter lists
+LPAREN:        '(';
+RPAREN:        ')';
+LBRACE:        '{';
+RBRACE:        '}';
+LBRACKET:      '[';
+RBRACKET:      ']';
+COLON:         ':';
+SEMICOLON:     ';';
+COMMA:         ',';
+ASSIGN:        '=';
+INCREMENT:     '++';
+DECREMENT:     '--';
+PLUS:          '+';
+MINUS:         '-';
+TIMES:         '*';
+DIV:           '/';
+MOD:           '%';
+ARROW:         '->';
+EQUAL:         '==';
+UNEQUAL:       '!=';
+LESSER:        '<';
+GREATER:       '>';
+LESSER_EQ:     '<=';
+GREATER_EQ:    '>=';
+NOT:           '!';
+AND:           '&&';
+OR:            '||';
 
 
-// scanner rules
-BOOLEAN: 'boolean';
-INTEGER: 'integer';
-STRING: 'string';
-FUNCTION: 'fun';
+// declaraction
+STRUCT:        'struct';
+FUNCTION:      'fun';
+REF:           'out';
 
-COMMA: ',';
-COLON: ':';
-SEMICOLON: ';';
-LPAREN: '(';
-RPAREN: ')';
-LBRACE: '{';
-RBRACE: '}';
-LBRACK: '[';
-RBRACK: ']';
-ACCESS: '->';
+// control flow
+IF:            'if';
+ELSE:          'else';
+WHILE:         'while';
+RETURN:        'return';
 
-ASSIGN: '=';
-ADD: '+';
-SUB: '-';
-MUL: '*';
-DIV: '/';
-MOD: '%';
-INC: '++';
-DEC: '--';
+// types
+INT:           'integer';
+BOOLEAN:       'boolean';
+STRING:        'string';
 
-NOT: '!';
-EQUAL: '==';
-NOTEQUAL: '!=';
-GREATER: '>';
-LOWER: '<';
-GEQUAL: '>=';
-LEQUAL: '<=';
-AND: '&&';
-OR: '||';
-TRUE: 'true';
-FALSE: 'false';
+// special
+SIZE:          'size';
 
-STRUCT: 'struct';
-WHILE: 'while';
-IF: 'if';
-ELSE: 'else';
-RETURN: 'return';
+// values
+TRUE:          'true';
+FALSE:         'false';
+INTEGER:        ('+'|'-')?[0-9]+;
+STRINGCONSTANT: '"' (~'"')* '"'; //
 
-OUT: 'out';
-SIZE: 'size';
-READINT: 'readInt';
-WRITEINT: 'writeInt';
-READCHAR: 'readChar';
-WRITECHAR: 'writeChar';
+// identifiers: order is important as all other keywords have precendence
+ID : [a-zA-Z][a-zA-Z0-9_$]*;
 
-INDENT: [ \t\r\n]+ -> skip;
-LINECOMMENT: '//' ~[\r\n]* -> skip ;
-BLOCKCOMMENT: '/*' .*? '*/' -> skip;
-
-NUMBER: [+-]?[0-9]+;
-TEXT: '"' ('\\"'|.)*? '"';
-
-IDENTIFIER: [a-zA-Z][a-zA-Z0-9_$]*;
+// comments
+LINE_COMMENT: '//' ~[\r\n]* -> skip; // skip contents of line comments
+BLOCKCOMMENT: '/*' .*? '*/' -> skip; // skip contents of block comments
+WS:           [ \t\r\n]+    -> skip; // skip spaces, tabs, newlines
