@@ -33,11 +33,10 @@ public class SymbolTable {
          * Adds a symbol to this scope.
          *
          * @param symbol Symbol to add to scope (must not be null).
+         * @return False if the symbol already exists in the current scope, true if not.
          */
-        public void addSymbol(Symbol symbol) {
-            if (!symbols.add(symbol)) {
-                throw new IllegalStateException("declaration: symbol '" + symbol.identifier() + "' already declared");
-            }
+        public boolean addSymbol(Symbol symbol) {
+            return symbols.add(symbol);
         }
 
         /**

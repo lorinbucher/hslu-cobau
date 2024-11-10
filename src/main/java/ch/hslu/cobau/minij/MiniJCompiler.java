@@ -34,25 +34,20 @@ public class MiniJCompiler {
 
         // semantic check (milestone 3)
         AstBuilder astBuilder = new AstBuilder();
-        SymbolTableBuilder symbolTableBuilder = new SymbolTableBuilder();
-        Unit program;
-
         try {
             astBuilder.visit(unitContext);
-            program = astBuilder.getUnit();
-            program.accept(symbolTableBuilder);
         } catch (NumberFormatException e) {
             errorListener.semanticError("number out of range: " + e.getMessage());
-        } catch (IllegalStateException e) {
-            errorListener.semanticError(e.getMessage());
-        } finally {
-            if (errorListener.hasErrors()) {
-                System.exit(1);
-            }
+            System.exit(1);
         }
 
-        // run the semantic analysis
+        // build the symbol table
+        Unit program = astBuilder.getUnit();
+        SymbolTableBuilder symbolTableBuilder = new SymbolTableBuilder(errorListener);
+        program.accept(symbolTableBuilder);
         SymbolTable symbolTable = symbolTableBuilder.getSymbolTable();
+
+        // run the semantic analysis
         // TODO (lorin): check existence, function call args, type, etc.
 
         // code generation (milestone 4)
