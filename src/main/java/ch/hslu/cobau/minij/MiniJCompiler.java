@@ -2,6 +2,7 @@ package ch.hslu.cobau.minij;
 
 import ch.hslu.cobau.minij.ast.AstBuilder;
 import ch.hslu.cobau.minij.ast.entity.Unit;
+import ch.hslu.cobau.minij.semantic.SemanticAnalyser;
 import ch.hslu.cobau.minij.semantic.symbol.SymbolTable;
 import ch.hslu.cobau.minij.semantic.symbol.SymbolTableBuilder;
 import org.antlr.v4.runtime.CharStream;
@@ -48,7 +49,8 @@ public class MiniJCompiler {
         SymbolTable symbolTable = symbolTableBuilder.getSymbolTable();
 
         // run the semantic analysis
-        // TODO (lorin): check existence, function call args, type, etc.
+        SemanticAnalyser semanticAnalyser = new SemanticAnalyser(errorListener, symbolTable);
+        program.accept(semanticAnalyser);
 
         // code generation (milestone 4)
 
