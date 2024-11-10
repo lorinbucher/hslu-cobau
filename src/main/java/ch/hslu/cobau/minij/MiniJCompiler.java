@@ -1,25 +1,18 @@
 package ch.hslu.cobau.minij;
 
-import org.antlr.v4.runtime.*;
+import ch.hslu.cobau.minij.ast.AstBuilder;
+import ch.hslu.cobau.minij.ast.entity.Unit;
+import ch.hslu.cobau.minij.semantic.symbol.SymbolTable;
+import ch.hslu.cobau.minij.semantic.symbol.SymbolTableBuilder;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.IOException;
 
 public class MiniJCompiler {
-    private static class EnhancedConsoleErrorListener extends ConsoleErrorListener {
-        private boolean hasErrors;
 
-        @Override
-        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-            super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
-            hasErrors = true;
-        }
-
-        public boolean hasErrors() {
-            return hasErrors;
-        }
-    }
-
-    public static void main(String[] args) throws IOException {    
+    public static void main(String[] args) throws IOException {
         // initialize lexer and parser
         CharStream charStream;
         if (args.length > 0) {
@@ -27,11 +20,11 @@ public class MiniJCompiler {
         } else {
             charStream = CharStreams.fromStream(System.in);
         }
-        
+
         MiniJLexer miniJLexer = new MiniJLexer(charStream);
         CommonTokenStream commonTokenStream = new CommonTokenStream(miniJLexer);
         MiniJParser miniJParser = new MiniJParser(commonTokenStream);
-        
+
         EnhancedConsoleErrorListener errorListener = new EnhancedConsoleErrorListener();
         miniJParser.removeErrorListeners();
         miniJParser.addErrorListener(errorListener);
@@ -40,8 +33,30 @@ public class MiniJCompiler {
         MiniJParser.UnitContext unitContext = miniJParser.unit();
 
         // semantic check (milestone 3)
+        AstBuilder astBuilder = new AstBuilder();
+        SymbolTableBuilder symbolTableBuilder = new SymbolTableBuilder();
+        Unit program;
+
+        try {
+            astBuilder.visit(unitContext);
+            program = astBuilder.getUnit();
+            program.accept(symbolTableBuilder);
+        } catch (NumberFormatException e) {
+            errorListener.semanticError("number out of range: " + e.getMessage());
+        } catch (IllegalStateException e) {
+            errorListener.semanticError(e.getMessage());
+        } finally {
+            if (errorListener.hasErrors()) {
+                System.exit(1);
+            }
+        }
+
+        // run the semantic analysis
+        SymbolTable symbolTable = symbolTableBuilder.getSymbolTable();
+        // TODO (lorin): check existence, function call args, type, etc.
+
         // code generation (milestone 4)
-        
+
         System.exit(errorListener.hasErrors() ? 1 : 0);
     }
 }
