@@ -6,7 +6,6 @@ import ch.hslu.cobau.minij.ast.entity.Declaration;
 import ch.hslu.cobau.minij.ast.entity.Function;
 import ch.hslu.cobau.minij.ast.type.IntegerType;
 import ch.hslu.cobau.minij.ast.type.RecordType;
-import ch.hslu.cobau.minij.semantic.symbol.SymbolTable;
 
 /**
  * Implements the semantic analysis for the MiniJ language.

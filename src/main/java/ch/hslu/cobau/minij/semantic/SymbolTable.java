@@ -1,4 +1,4 @@
-package ch.hslu.cobau.minij.semantic.symbol;
+package ch.hslu.cobau.minij.semantic;
 
 import ch.hslu.cobau.minij.ast.AstElement;
 
