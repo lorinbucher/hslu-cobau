@@ -5,7 +5,7 @@ import ch.hslu.cobau.minij.ast.BaseAstVisitor;
 import ch.hslu.cobau.minij.ast.entity.Declaration;
 import ch.hslu.cobau.minij.ast.entity.Function;
 import ch.hslu.cobau.minij.ast.type.IntegerType;
-import ch.hslu.cobau.minij.ast.type.VoidType;
+import ch.hslu.cobau.minij.ast.type.RecordType;
 import ch.hslu.cobau.minij.semantic.symbol.SymbolTable;
 
 /**
@@ -38,6 +38,16 @@ public class SemanticAnalyser extends BaseAstVisitor {
             if (!function.getReturnType().getClass().equals(IntegerType.class)) {
                 errorListener.semanticError("main: function must have return type integer");
             }
+        }
+    }
+
+    @Override
+    public void visit(Declaration declaration) {
+        declaration.visitChildren(this);
+
+        // NOTE (lorin): void is technically not defined as keyword in the language, but checking explicitly anyway
+        if (declaration.getType().equals(new RecordType("void"))) {
+            errorListener.semanticError("declaration: '" + declaration.getIdentifier() + "' must not be of type void");
         }
     }
 }
