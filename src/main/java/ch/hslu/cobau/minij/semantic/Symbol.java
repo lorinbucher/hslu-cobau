@@ -20,7 +20,8 @@ public record Symbol(String identifier, SymbolEntity entity, Type type) {
         if (this == o) return true;
         if (!(o instanceof Symbol symbol)) return false;
 
-        return Objects.equals(identifier, symbol.identifier);
+        return Objects.equals(identifier, symbol.identifier)
+                && Objects.equals(entity, symbol.entity);
     }
 
     /**
@@ -30,6 +31,6 @@ public record Symbol(String identifier, SymbolEntity entity, Type type) {
      */
     @Override
     public int hashCode() {
-        return Objects.hashCode(identifier);
+        return Objects.hash(identifier, entity);
     }
 }
