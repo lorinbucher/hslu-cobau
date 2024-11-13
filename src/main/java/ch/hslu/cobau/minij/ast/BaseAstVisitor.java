@@ -81,7 +81,6 @@ public class BaseAstVisitor implements AstVisitor {
         callExpression.visitChildren(this);
     }
 
-
     @Override
     public void visit(VariableAccess variable) {
         variable.visitChildren(this);

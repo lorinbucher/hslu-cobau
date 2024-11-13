@@ -6,6 +6,7 @@ import ch.hslu.cobau.minij.ast.entity.Declaration;
 import ch.hslu.cobau.minij.ast.entity.Function;
 import ch.hslu.cobau.minij.ast.entity.Struct;
 import ch.hslu.cobau.minij.ast.entity.Unit;
+import ch.hslu.cobau.minij.ast.expression.VariableAccess;
 import ch.hslu.cobau.minij.ast.type.VoidType;
 
 /**
@@ -33,15 +34,6 @@ public class SymbolTableBuilder extends BaseAstVisitor {
     }
 
     @Override
-    public void visit(Declaration declaration) {
-        Symbol symbol = new Symbol(declaration.getIdentifier(), SymbolEntity.DECLARATION, declaration.getType());
-        addSymbol(symbol);
-        currentScope = symbolTable.addScope(declaration, currentScope);
-        super.visit(declaration);
-        currentScope = currentScope.getParent();
-    }
-
-    @Override
     public void visit(Function function) {
         Symbol symbol = new Symbol(function.getIdentifier(), SymbolEntity.FUNCTION, function.getReturnType());
         addSymbol(symbol);
@@ -56,6 +48,22 @@ public class SymbolTableBuilder extends BaseAstVisitor {
         addSymbol(symbol);
         currentScope = symbolTable.addScope(struct, currentScope);
         super.visit(struct);
+        currentScope = currentScope.getParent();
+    }
+
+    @Override
+    public void visit(Declaration declaration) {
+        Symbol symbol = new Symbol(declaration.getIdentifier(), SymbolEntity.DECLARATION, declaration.getType());
+        addSymbol(symbol);
+        currentScope = symbolTable.addScope(declaration, currentScope);
+        super.visit(declaration);
+        currentScope = currentScope.getParent();
+    }
+
+    @Override
+    public void visit(VariableAccess variable) {
+        currentScope = symbolTable.addScope(variable, currentScope);
+        super.visit(variable);
         currentScope = currentScope.getParent();
     }
 

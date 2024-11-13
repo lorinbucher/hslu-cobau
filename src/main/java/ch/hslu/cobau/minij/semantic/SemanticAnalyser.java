@@ -4,8 +4,10 @@ import ch.hslu.cobau.minij.EnhancedConsoleErrorListener;
 import ch.hslu.cobau.minij.ast.BaseAstVisitor;
 import ch.hslu.cobau.minij.ast.entity.Declaration;
 import ch.hslu.cobau.minij.ast.entity.Function;
+import ch.hslu.cobau.minij.ast.expression.VariableAccess;
 import ch.hslu.cobau.minij.ast.type.IntegerType;
 import ch.hslu.cobau.minij.ast.type.RecordType;
+import ch.hslu.cobau.minij.ast.type.Type;
 
 /**
  * Implements the semantic analysis for the MiniJ language.
@@ -42,11 +44,26 @@ public class SemanticAnalyser extends BaseAstVisitor {
 
     @Override
     public void visit(Declaration declaration) {
-        declaration.visitChildren(this);
+        super.visit(declaration);
 
         // NOTE (lorin): void is technically not defined as keyword in the language, but checking explicitly anyway
         if (declaration.getType().equals(new RecordType("void"))) {
             errorListener.semanticError("declaration: '" + declaration.getIdentifier() + "' must not be of type void");
+        }
+    }
+
+    @Override
+    public void visit(VariableAccess variableAccess) {
+        super.visit(variableAccess);
+
+        SymbolTable.Scope scope = this.symbolTable.getScope(variableAccess);
+        if (scope != null) {
+            Symbol symbol = new Symbol(variableAccess.getIdentifier(), SymbolEntity.DECLARATION, new Type());
+            if (!scope.hasSymbol(symbol)) {
+                errorListener.semanticError("variable: '" + variableAccess.getIdentifier() + "' not found");
+            }
+        } else {
+            errorListener.semanticError("variable: scope for '" + variableAccess.getIdentifier() + "' not found");
         }
     }
 }
