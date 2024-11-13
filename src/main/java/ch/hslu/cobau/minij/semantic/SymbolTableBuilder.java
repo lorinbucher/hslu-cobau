@@ -83,7 +83,7 @@ public class SymbolTableBuilder extends BaseAstVisitor {
      */
     private void addSymbol(Symbol symbol) {
         if (!currentScope.addSymbol(symbol)) {
-            errorListener.semanticError("declaration: symbol '" + symbol.identifier() + "' already declared");
+            errorListener.semanticError("symbol '" + symbol.identifier() + "' already declared");
         }
     }
 }

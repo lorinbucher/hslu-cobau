@@ -33,10 +33,10 @@ public class SemanticAnalyser extends BaseAstVisitor {
 
         if (function.getIdentifier().equals("main")) {
             if (!function.getFormalParameters().isEmpty()) {
-                errorListener.semanticError("main: function must not have any parameters");
+                errorListener.semanticError("main function must not have any parameters");
             }
             if (!function.getReturnType().getClass().equals(IntegerType.class)) {
-                errorListener.semanticError("main: function must have return type integer");
+                errorListener.semanticError("main function must have return type integer");
             }
         }
     }
@@ -47,19 +47,19 @@ public class SemanticAnalyser extends BaseAstVisitor {
 
         // NOTE (lorin): void is technically not defined as keyword in the language, but checking explicitly anyway
         if (declaration.getType().equals(new RecordType("void"))) {
-            errorListener.semanticError("declaration: '" + declaration.getIdentifier() + "' must not be of type void");
+            errorListener.semanticError("type of '" + declaration.getIdentifier() + "' must not be void");
         }
 
         SymbolTable.Scope scope = this.symbolTable.getScope(declaration);
         if (scope == null) {
-            errorListener.semanticError("declaration: scope for '" + declaration.getIdentifier() + "' not found");
+            errorListener.semanticError("scope for '" + declaration.getIdentifier() + "' not found");
             return;
         }
 
         if (declaration.getType() instanceof RecordType type) {
             Symbol symbol = new Symbol(type.getIdentifier(), SymbolEntity.STRUCT, null);
             if (!scope.hasSymbol(symbol)) {
-                errorListener.semanticError("declaration: struct '" + type.getIdentifier() + "' not found");
+                errorListener.semanticError("struct type '" + type.getIdentifier() + "' not found");
             }
         }
     }
@@ -70,13 +70,13 @@ public class SemanticAnalyser extends BaseAstVisitor {
 
         SymbolTable.Scope scope = this.symbolTable.getScope(variable);
         if (scope == null) {
-            errorListener.semanticError("variable: scope for '" + variable.getIdentifier() + "' not found");
+            errorListener.semanticError("scope for '" + variable.getIdentifier() + "' not found");
             return;
         }
 
         Symbol symbol = new Symbol(variable.getIdentifier(), SymbolEntity.DECLARATION, null);
         if (!scope.hasSymbol(symbol)) {
-            errorListener.semanticError("variable: '" + variable.getIdentifier() + "' not found");
+            errorListener.semanticError("variable '" + variable.getIdentifier() + "' not found");
         }
     }
 }
