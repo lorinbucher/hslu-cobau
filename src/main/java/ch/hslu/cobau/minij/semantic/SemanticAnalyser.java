@@ -7,7 +7,6 @@ import ch.hslu.cobau.minij.ast.entity.Function;
 import ch.hslu.cobau.minij.ast.expression.VariableAccess;
 import ch.hslu.cobau.minij.ast.type.IntegerType;
 import ch.hslu.cobau.minij.ast.type.RecordType;
-import ch.hslu.cobau.minij.ast.type.Type;
 
 /**
  * Implements the semantic analysis for the MiniJ language.
@@ -50,20 +49,34 @@ public class SemanticAnalyser extends BaseAstVisitor {
         if (declaration.getType().equals(new RecordType("void"))) {
             errorListener.semanticError("declaration: '" + declaration.getIdentifier() + "' must not be of type void");
         }
+
+        SymbolTable.Scope scope = this.symbolTable.getScope(declaration);
+        if (scope == null) {
+            errorListener.semanticError("declaration: scope for '" + declaration.getIdentifier() + "' not found");
+            return;
+        }
+
+        if (declaration.getType() instanceof RecordType type) {
+            Symbol symbol = new Symbol(type.getIdentifier(), SymbolEntity.STRUCT, null);
+            if (!scope.hasSymbol(symbol)) {
+                errorListener.semanticError("declaration: struct '" + type.getIdentifier() + "' not found");
+            }
+        }
     }
 
     @Override
-    public void visit(VariableAccess variableAccess) {
-        super.visit(variableAccess);
+    public void visit(VariableAccess variable) {
+        super.visit(variable);
 
-        SymbolTable.Scope scope = this.symbolTable.getScope(variableAccess);
-        if (scope != null) {
-            Symbol symbol = new Symbol(variableAccess.getIdentifier(), SymbolEntity.DECLARATION, new Type());
-            if (!scope.hasSymbol(symbol)) {
-                errorListener.semanticError("variable: '" + variableAccess.getIdentifier() + "' not found");
-            }
-        } else {
-            errorListener.semanticError("variable: scope for '" + variableAccess.getIdentifier() + "' not found");
+        SymbolTable.Scope scope = this.symbolTable.getScope(variable);
+        if (scope == null) {
+            errorListener.semanticError("variable: scope for '" + variable.getIdentifier() + "' not found");
+            return;
+        }
+
+        Symbol symbol = new Symbol(variable.getIdentifier(), SymbolEntity.DECLARATION, null);
+        if (!scope.hasSymbol(symbol)) {
+            errorListener.semanticError("variable: '" + variable.getIdentifier() + "' not found");
         }
     }
 }
