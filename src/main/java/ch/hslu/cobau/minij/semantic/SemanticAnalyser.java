@@ -4,6 +4,7 @@ import ch.hslu.cobau.minij.EnhancedConsoleErrorListener;
 import ch.hslu.cobau.minij.ast.BaseAstVisitor;
 import ch.hslu.cobau.minij.ast.entity.Declaration;
 import ch.hslu.cobau.minij.ast.entity.Function;
+import ch.hslu.cobau.minij.ast.expression.CallExpression;
 import ch.hslu.cobau.minij.ast.expression.VariableAccess;
 import ch.hslu.cobau.minij.ast.type.IntegerType;
 import ch.hslu.cobau.minij.ast.type.RecordType;
@@ -61,6 +62,22 @@ public class SemanticAnalyser extends BaseAstVisitor {
             if (!scope.hasSymbol(symbol)) {
                 errorListener.semanticError("struct type '" + type.getIdentifier() + "' not found");
             }
+        }
+    }
+
+    @Override
+    public void visit(CallExpression call) {
+        super.visit(call);
+
+        SymbolTable.Scope scope = this.symbolTable.getScope(call);
+        if (scope == null) {
+            errorListener.semanticError("scope for '" + call.getIdentifier() + "' not found");
+            return;
+        }
+
+        Symbol symbol = new Symbol(call.getIdentifier(), SymbolEntity.FUNCTION, null);
+        if (!scope.hasSymbol(symbol)) {
+            errorListener.semanticError("function '" + call.getIdentifier() + "' not found");
         }
     }
 

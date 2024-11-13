@@ -6,6 +6,7 @@ import ch.hslu.cobau.minij.ast.entity.Declaration;
 import ch.hslu.cobau.minij.ast.entity.Function;
 import ch.hslu.cobau.minij.ast.entity.Struct;
 import ch.hslu.cobau.minij.ast.entity.Unit;
+import ch.hslu.cobau.minij.ast.expression.CallExpression;
 import ch.hslu.cobau.minij.ast.expression.VariableAccess;
 import ch.hslu.cobau.minij.ast.type.VoidType;
 
@@ -57,6 +58,13 @@ public class SymbolTableBuilder extends BaseAstVisitor {
         addSymbol(symbol);
         currentScope = symbolTable.addScope(declaration, currentScope);
         super.visit(declaration);
+        currentScope = currentScope.getParent();
+    }
+
+    @Override
+    public void visit(CallExpression call) {
+        currentScope = symbolTable.addScope(call, currentScope);
+        super.visit(call);
         currentScope = currentScope.getParent();
     }
 
