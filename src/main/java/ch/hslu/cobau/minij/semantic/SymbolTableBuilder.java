@@ -6,8 +6,7 @@ import ch.hslu.cobau.minij.ast.constants.*;
 import ch.hslu.cobau.minij.ast.entity.*;
 import ch.hslu.cobau.minij.ast.expression.*;
 import ch.hslu.cobau.minij.ast.statement.*;
-import ch.hslu.cobau.minij.ast.type.RecordType;
-import ch.hslu.cobau.minij.ast.type.Type;
+import ch.hslu.cobau.minij.ast.type.*;
 
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,7 @@ public class SymbolTableBuilder extends BaseAstVisitor {
     @Override
     public void visit(Unit program) {
         currentScope = symbolTable.addScope(program, currentScope);
+        addBuiltInFunctions();
         super.visit(program);
     }
 
@@ -196,5 +196,19 @@ public class SymbolTableBuilder extends BaseAstVisitor {
         if (!currentScope.addSymbol(symbol)) {
             errorListener.semanticError("symbol '" + symbol.identifier() + "' already declared");
         }
+    }
+
+    /**
+     * Adds the built-in functions.
+     */
+    private void addBuiltInFunctions() {
+        addSymbol(new Symbol("writeInt", SymbolEntity.FUNCTION, new VoidType(), null));
+        addSymbol(new Symbol("readInt", SymbolEntity.FUNCTION, new IntegerType(), null));
+        addSymbol(new Symbol("writeChar", SymbolEntity.FUNCTION, new VoidType(), null));
+        addSymbol(new Symbol("readChar", SymbolEntity.FUNCTION, new IntegerType(), null));
+        symbolTable.addFunction("writeInt", new SymbolFunction("writeInt", new VoidType(), List.of(new IntegerType())));
+        symbolTable.addFunction("readInt", new SymbolFunction("readInt", new IntegerType(), List.of()));
+        symbolTable.addFunction("writeChar", new SymbolFunction("writeChar", new VoidType(), List.of(new IntegerType())));
+        symbolTable.addFunction("readChar", new SymbolFunction("readChar", new IntegerType(), List.of()));
     }
 }
