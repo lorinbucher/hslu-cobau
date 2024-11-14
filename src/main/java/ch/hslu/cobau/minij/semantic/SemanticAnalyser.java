@@ -5,6 +5,7 @@ import ch.hslu.cobau.minij.ast.BaseAstVisitor;
 import ch.hslu.cobau.minij.ast.entity.Declaration;
 import ch.hslu.cobau.minij.ast.entity.Function;
 import ch.hslu.cobau.minij.ast.expression.CallExpression;
+import ch.hslu.cobau.minij.ast.expression.FieldAccess;
 import ch.hslu.cobau.minij.ast.expression.VariableAccess;
 import ch.hslu.cobau.minij.ast.type.IntegerType;
 import ch.hslu.cobau.minij.ast.type.RecordType;
@@ -51,7 +52,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
             errorListener.semanticError("type of '" + declaration.getIdentifier() + "' must not be void");
         }
 
-        SymbolTable.Scope scope = this.symbolTable.getScope(declaration);
+        SymbolTable.Scope scope = symbolTable.getScope(declaration);
         if (scope == null) {
             errorListener.semanticError("scope for '" + declaration.getIdentifier() + "' not found");
             return;
@@ -68,7 +69,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
     public void visit(CallExpression call) {
         super.visit(call);
 
-        SymbolTable.Scope scope = this.symbolTable.getScope(call);
+        SymbolTable.Scope scope = symbolTable.getScope(call);
         if (scope == null) {
             errorListener.semanticError("scope for '" + call.getIdentifier() + "' not found");
             return;
@@ -83,7 +84,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
     public void visit(VariableAccess variable) {
         super.visit(variable);
 
-        SymbolTable.Scope scope = this.symbolTable.getScope(variable);
+        SymbolTable.Scope scope = symbolTable.getScope(variable);
         if (scope == null) {
             errorListener.semanticError("scope for '" + variable.getIdentifier() + "' not found");
             return;
@@ -91,6 +92,30 @@ public class SemanticAnalyser extends BaseAstVisitor {
 
         if (!scope.hasSymbol(variable.getIdentifier(), SymbolEntity.DECLARATION)) {
             errorListener.semanticError("variable '" + variable.getIdentifier() + "' not found");
+        }
+    }
+
+    @Override
+    public void visit(FieldAccess field) {
+        super.visit(field);
+
+        SymbolTable.Scope scope = symbolTable.getScope(field);
+        if (scope == null) {
+            errorListener.semanticError("scope for '" + field.getField() + "' not found");
+            return;
+        }
+
+        VariableAccess variable = (VariableAccess) field.getBase();
+        Symbol declaration = scope.getSymbol(variable.getIdentifier(), SymbolEntity.DECLARATION);
+        if (declaration != null && declaration.type() instanceof RecordType type) {
+            Symbol struct = scope.getSymbol(type.getIdentifier(), SymbolEntity.STRUCT);
+            if (struct != null) {
+                if (!symbolTable.getScope(struct.astElement()).hasSymbol(field.getField(), SymbolEntity.DECLARATION)) {
+                    errorListener.semanticError("field '" + field.getField() + "' not found");
+                }
+            }
+        } else {
+            errorListener.semanticError("variable '" + variable.getIdentifier() + "' is not a struct");
         }
     }
 }
