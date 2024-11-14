@@ -3,9 +3,7 @@ package ch.hslu.cobau.minij.semantic;
 import ch.hslu.cobau.minij.ast.AstElement;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Implements the symbol table for the MiniJ language.
@@ -18,7 +16,9 @@ public class SymbolTable {
     public static class Scope {
 
         private final Scope parent;
-        private final Set<Symbol> symbols = new HashSet<>();
+        private final Map<String, Symbol> symbols = new HashMap<>();
+
+        private String getSymbol = "test";
 
         /**
          * Creates a new scope with a parent scope.
@@ -36,24 +36,39 @@ public class SymbolTable {
          * @return False if the symbol already exists in the current scope, true if not.
          */
         public boolean addSymbol(Symbol symbol) {
-            return symbols.add(symbol);
+            return symbols.putIfAbsent(symbol.identifier(), symbol) == null;
+        }
+
+        /**
+         * Returns the symbol if this or any parent scope contains the symbol.
+         *
+         * @param identifier The identifier of the symbol.
+         * @param entity     The entity of the symbol.
+         * @return The symbol if this or any parent scope contains the symbol, null if not.
+         */
+        public Symbol getSymbol(String identifier, SymbolEntity entity) {
+            Scope currentScope = this;
+            do {
+                if (currentScope.symbols.containsKey(identifier)) {
+                    Symbol symbol = currentScope.symbols.get(identifier);
+                    if (entity.equals(symbol.entity())) {
+                        return symbol;
+                    }
+                }
+                currentScope = currentScope.parent;
+            } while (currentScope != null);
+            return null;
         }
 
         /**
          * Returns true if this or any parent scope contains the symbol.
          *
-         * @param symbol Symbol to check.
-         * @return True if this or any parent scope contains the symbol.
+         * @param identifier The identifier of the symbol.
+         * @param entity     The entity of the symbol.
+         * @return True if this or any parent scope contains the symbol, false if not.
          */
-        public boolean hasSymbol(Symbol symbol) {
-            Scope currentScope = this;
-            do {
-                if (currentScope.symbols.contains(symbol)) {
-                    return true;
-                }
-                currentScope = currentScope.parent;
-            } while (currentScope != null);
-            return false;
+        public boolean hasSymbol(String identifier, SymbolEntity entity) {
+            return getSymbol(identifier, entity) != null;
         }
 
         /**

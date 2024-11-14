@@ -58,8 +58,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
         }
 
         if (declaration.getType() instanceof RecordType type) {
-            Symbol symbol = new Symbol(type.getIdentifier(), SymbolEntity.STRUCT, null);
-            if (!scope.hasSymbol(symbol)) {
+            if (!scope.hasSymbol(type.getIdentifier(), SymbolEntity.STRUCT)) {
                 errorListener.semanticError("struct type '" + type.getIdentifier() + "' not found");
             }
         }
@@ -75,8 +74,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
             return;
         }
 
-        Symbol symbol = new Symbol(call.getIdentifier(), SymbolEntity.FUNCTION, null);
-        if (!scope.hasSymbol(symbol)) {
+        if (!scope.hasSymbol(call.getIdentifier(), SymbolEntity.FUNCTION)) {
             errorListener.semanticError("function '" + call.getIdentifier() + "' not found");
         }
     }
@@ -91,8 +89,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
             return;
         }
 
-        Symbol symbol = new Symbol(variable.getIdentifier(), SymbolEntity.DECLARATION, null);
-        if (!scope.hasSymbol(symbol)) {
+        if (!scope.hasSymbol(variable.getIdentifier(), SymbolEntity.DECLARATION)) {
             errorListener.semanticError("variable '" + variable.getIdentifier() + "' not found");
         }
     }
