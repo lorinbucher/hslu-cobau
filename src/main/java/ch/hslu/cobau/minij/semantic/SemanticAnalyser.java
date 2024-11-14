@@ -7,8 +7,11 @@ import ch.hslu.cobau.minij.ast.entity.Function;
 import ch.hslu.cobau.minij.ast.expression.CallExpression;
 import ch.hslu.cobau.minij.ast.expression.FieldAccess;
 import ch.hslu.cobau.minij.ast.expression.VariableAccess;
+import ch.hslu.cobau.minij.ast.statement.ReturnStatement;
+import ch.hslu.cobau.minij.ast.statement.Statement;
 import ch.hslu.cobau.minij.ast.type.IntegerType;
 import ch.hslu.cobau.minij.ast.type.RecordType;
+import ch.hslu.cobau.minij.ast.type.VoidType;
 
 /**
  * Implements the semantic analysis for the MiniJ language.
@@ -39,6 +42,17 @@ public class SemanticAnalyser extends BaseAstVisitor {
             }
             if (!function.getReturnType().getClass().equals(IntegerType.class)) {
                 errorListener.semanticError("main function must have return type integer");
+            }
+        }
+
+        for (Statement statement : function.getStatements()) {
+            if (statement instanceof ReturnStatement returnStatement) {
+                if (function.getReturnType() instanceof VoidType && returnStatement.getExpression() != null) {
+                    errorListener.semanticError("function '" + function.getIdentifier() + "' must not return a value");
+                }
+                if (!(function.getReturnType() instanceof VoidType) && returnStatement.getExpression() == null) {
+                    errorListener.semanticError("function '" + function.getIdentifier() + "' must return a value");
+                }
             }
         }
     }
