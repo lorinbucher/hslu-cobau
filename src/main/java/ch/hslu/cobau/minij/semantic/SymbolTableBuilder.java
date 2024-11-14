@@ -2,13 +2,10 @@ package ch.hslu.cobau.minij.semantic;
 
 import ch.hslu.cobau.minij.EnhancedConsoleErrorListener;
 import ch.hslu.cobau.minij.ast.BaseAstVisitor;
-import ch.hslu.cobau.minij.ast.entity.Declaration;
-import ch.hslu.cobau.minij.ast.entity.Function;
-import ch.hslu.cobau.minij.ast.entity.Struct;
-import ch.hslu.cobau.minij.ast.entity.Unit;
-import ch.hslu.cobau.minij.ast.expression.CallExpression;
-import ch.hslu.cobau.minij.ast.expression.VariableAccess;
-import ch.hslu.cobau.minij.ast.type.VoidType;
+import ch.hslu.cobau.minij.ast.constants.*;
+import ch.hslu.cobau.minij.ast.entity.*;
+import ch.hslu.cobau.minij.ast.expression.*;
+import ch.hslu.cobau.minij.ast.statement.*;
 
 /**
  * Builds the symbol table for the MiniJ language.
@@ -36,8 +33,7 @@ public class SymbolTableBuilder extends BaseAstVisitor {
 
     @Override
     public void visit(Function function) {
-        Symbol symbol = new Symbol(function.getIdentifier(), SymbolEntity.FUNCTION, function.getReturnType());
-        addSymbol(symbol);
+        addSymbol(new Symbol(function.getIdentifier(), SymbolEntity.FUNCTION, function.getReturnType()));
         currentScope = symbolTable.addScope(function, currentScope);
         super.visit(function);
         currentScope = currentScope.getParent();
@@ -45,8 +41,7 @@ public class SymbolTableBuilder extends BaseAstVisitor {
 
     @Override
     public void visit(Struct struct) {
-        Symbol symbol = new Symbol(struct.getIdentifier(), SymbolEntity.STRUCT, new VoidType());
-        addSymbol(symbol);
+        addSymbol(new Symbol(struct.getIdentifier(), SymbolEntity.STRUCT, null));
         currentScope = symbolTable.addScope(struct, currentScope);
         super.visit(struct);
         currentScope = currentScope.getParent();
@@ -54,25 +49,112 @@ public class SymbolTableBuilder extends BaseAstVisitor {
 
     @Override
     public void visit(Declaration declaration) {
-        Symbol symbol = new Symbol(declaration.getIdentifier(), SymbolEntity.DECLARATION, declaration.getType());
-        addSymbol(symbol);
+        addSymbol(new Symbol(declaration.getIdentifier(), SymbolEntity.DECLARATION, declaration.getType()));
         currentScope = symbolTable.addScope(declaration, currentScope);
         super.visit(declaration);
         currentScope = currentScope.getParent();
     }
 
     @Override
-    public void visit(CallExpression call) {
-        currentScope = symbolTable.addScope(call, currentScope);
-        super.visit(call);
-        currentScope = currentScope.getParent();
+    public void visit(ReturnStatement returnStatement) {
+        symbolTable.addScope(returnStatement, currentScope);
+        super.visit(returnStatement);
+    }
+
+    @Override
+    public void visit(AssignmentStatement assignment) {
+        symbolTable.addScope(assignment, currentScope);
+        super.visit(assignment);
+    }
+
+    @Override
+    public void visit(DeclarationStatement declarationStatement) {
+        symbolTable.addScope(declarationStatement, currentScope);
+        super.visit(declarationStatement);
+    }
+
+    @Override
+    public void visit(CallStatement callStatement) {
+        symbolTable.addScope(callStatement, currentScope);
+        super.visit(callStatement);
+    }
+
+    @Override
+    public void visit(IfStatement ifStatement) {
+        symbolTable.addScope(ifStatement, currentScope);
+        super.visit(ifStatement);
+    }
+
+    @Override
+    public void visit(WhileStatement whileStatement) {
+        symbolTable.addScope(whileStatement, currentScope);
+        super.visit(whileStatement);
+    }
+
+    @Override
+    public void visit(Block block) {
+        symbolTable.addScope(block, currentScope);
+        super.visit(block);
+    }
+
+    @Override
+    public void visit(UnaryExpression unaryExpression) {
+        symbolTable.addScope(unaryExpression, currentScope);
+        super.visit(unaryExpression);
+    }
+
+    @Override
+    public void visit(BinaryExpression binaryExpression) {
+        symbolTable.addScope(binaryExpression, currentScope);
+        super.visit(binaryExpression);
+    }
+
+    @Override
+    public void visit(CallExpression callExpression) {
+        symbolTable.addScope(callExpression, currentScope);
+        super.visit(callExpression);
     }
 
     @Override
     public void visit(VariableAccess variable) {
-        currentScope = symbolTable.addScope(variable, currentScope);
+        symbolTable.addScope(variable, currentScope);
         super.visit(variable);
-        currentScope = currentScope.getParent();
+    }
+
+    @Override
+    public void visit(ArrayAccess arrayAccess) {
+        symbolTable.addScope(arrayAccess, currentScope);
+        super.visit(arrayAccess);
+    }
+
+    @Override
+    public void visit(FieldAccess fieldAccess) {
+        symbolTable.addScope(fieldAccess, currentScope);
+        super.visit(fieldAccess);
+    }
+
+    @Override
+    public void visit(FalseConstant falseConstant) {
+        symbolTable.addScope(falseConstant, currentScope);
+        super.visit(falseConstant);
+    }
+
+    @Override
+    public void visit(IntegerConstant integerConstant) {
+        symbolTable.addScope(integerConstant, currentScope);
+        super.visit(integerConstant);
+    }
+
+    @Override
+    public void visit(StringConstant stringConstant) {
+        symbolTable.addScope(stringConstant, currentScope);
+        super.visit(stringConstant);
+    }
+
+    @Override
+    public void visit(TrueConstant trueConstant) {
+        symbolTable.addScope(trueConstant, currentScope);
+        super.visit(trueConstant);
     }
 
     /**
