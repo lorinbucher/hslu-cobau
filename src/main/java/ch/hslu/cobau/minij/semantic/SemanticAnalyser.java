@@ -75,8 +75,16 @@ public class SemanticAnalyser extends BaseAstVisitor {
             return;
         }
 
-        if (!scope.hasSymbol(call.getIdentifier(), SymbolEntity.FUNCTION)) {
+        Symbol symbol = scope.getSymbol(call.getIdentifier(), SymbolEntity.FUNCTION);
+        if (symbol == null) {
             errorListener.semanticError("function '" + call.getIdentifier() + "' not found");
+            return;
+        }
+
+        int paramCount = ((Function) symbol.astElement()).getFormalParameters().size();
+        if (paramCount != call.getParameters().size()) {
+            errorListener.semanticError("function '" + call.getIdentifier() + "' expects " + paramCount
+                    + " parameters but " + call.getParameters().size() + " were given");
         }
     }
 
