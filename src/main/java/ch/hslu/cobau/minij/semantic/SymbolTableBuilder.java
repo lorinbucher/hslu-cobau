@@ -6,6 +6,7 @@ import ch.hslu.cobau.minij.ast.constants.*;
 import ch.hslu.cobau.minij.ast.entity.*;
 import ch.hslu.cobau.minij.ast.expression.*;
 import ch.hslu.cobau.minij.ast.statement.*;
+import ch.hslu.cobau.minij.ast.type.RecordType;
 
 /**
  * Builds the symbol table for the MiniJ language.
@@ -33,7 +34,7 @@ public class SymbolTableBuilder extends BaseAstVisitor {
 
     @Override
     public void visit(Function function) {
-        addSymbol(new Symbol(function.getIdentifier(), SymbolEntity.FUNCTION, function.getReturnType()));
+        addSymbol(new Symbol(function.getIdentifier(), SymbolEntity.FUNCTION, function.getReturnType(), function));
         currentScope = symbolTable.addScope(function, currentScope);
         super.visit(function);
         currentScope = currentScope.getParent();
@@ -41,7 +42,7 @@ public class SymbolTableBuilder extends BaseAstVisitor {
 
     @Override
     public void visit(Struct struct) {
-        addSymbol(new Symbol(struct.getIdentifier(), SymbolEntity.STRUCT, null));
+        addSymbol(new Symbol(struct.getIdentifier(), SymbolEntity.STRUCT, null, struct));
         currentScope = symbolTable.addScope(struct, currentScope);
         super.visit(struct);
         currentScope = currentScope.getParent();
@@ -49,7 +50,7 @@ public class SymbolTableBuilder extends BaseAstVisitor {
 
     @Override
     public void visit(Declaration declaration) {
-        addSymbol(new Symbol(declaration.getIdentifier(), SymbolEntity.DECLARATION, declaration.getType()));
+        addSymbol(new Symbol(declaration.getIdentifier(), SymbolEntity.DECLARATION, declaration.getType(), declaration));
         currentScope = symbolTable.addScope(declaration, currentScope);
         super.visit(declaration);
         currentScope = currentScope.getParent();

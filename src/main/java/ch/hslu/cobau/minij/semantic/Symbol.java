@@ -1,13 +1,19 @@
 package ch.hslu.cobau.minij.semantic;
 
+import ch.hslu.cobau.minij.ast.AstElement;
 import ch.hslu.cobau.minij.ast.type.Type;
 
 import java.util.Objects;
 
 /**
  * Represents a symbol in the symbol table of the MiniJ language.
+ *
+ * @param identifier The identifier of the symbol.
+ * @param entity     The entity of the symbol.
+ * @param type       The type of the symbol.
+ * @param astElement The element of the AST.
  */
-public record Symbol(String identifier, SymbolEntity entity, Type type) {
+public record Symbol(String identifier, SymbolEntity entity, Type type, AstElement astElement) {
 
     /**
      * A symbol is equal if the identifier is the same.

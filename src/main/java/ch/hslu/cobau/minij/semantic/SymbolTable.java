@@ -18,8 +18,6 @@ public class SymbolTable {
         private final Scope parent;
         private final Map<String, Symbol> symbols = new HashMap<>();
 
-        private String getSymbol = "test";
-
         /**
          * Creates a new scope with a parent scope.
          *
@@ -49,11 +47,9 @@ public class SymbolTable {
         public Symbol getSymbol(String identifier, SymbolEntity entity) {
             Scope currentScope = this;
             do {
-                if (currentScope.symbols.containsKey(identifier)) {
-                    Symbol symbol = currentScope.symbols.get(identifier);
-                    if (entity.equals(symbol.entity())) {
-                        return symbol;
-                    }
+                Symbol symbol = currentScope.symbols.get(identifier);
+                if (symbol != null && entity.equals(symbol.entity())) {
+                    return symbol;
                 }
                 currentScope = currentScope.parent;
             } while (currentScope != null);
