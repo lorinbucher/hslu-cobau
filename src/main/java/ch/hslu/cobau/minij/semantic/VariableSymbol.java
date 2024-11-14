@@ -1,22 +1,21 @@
 package ch.hslu.cobau.minij.semantic;
 
-import ch.hslu.cobau.minij.ast.type.RecordType;
+import ch.hslu.cobau.minij.ast.AstElement;
 import ch.hslu.cobau.minij.ast.type.Type;
 
-import java.util.Map;
 import java.util.Objects;
 
 /**
- * Represents a struct symbol in the symbol table of the MiniJ language.
+ * Represents a variable symbol in the symbol table of the MiniJ language.
  *
- * @param identifier The identifier of the struct symbol.
- * @param type       The type of the struct symbol.
- * @param fields     The fields of the struct symbol.
+ * @param identifier The identifier of the variable symbol.
+ * @param type       The type of the variable symbol.
+ * @param astElement The element of the AST.
  */
-public record SymbolStruct(String identifier, RecordType type, Map<String, Type> fields) {
+public record VariableSymbol(String identifier, Type type, AstElement astElement) {
 
     /**
-     * A struct symbol is equal if the identifier is the same.
+     * A variable symbol is equal if the identifier is the same.
      *
      * @param o Another object to compare to.
      * @return True if the other object is equal, false if not.
@@ -24,7 +23,7 @@ public record SymbolStruct(String identifier, RecordType type, Map<String, Type>
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SymbolStruct symbol)) return false;
+        if (!(o instanceof VariableSymbol symbol)) return false;
 
         return Objects.equals(identifier, symbol.identifier);
     }

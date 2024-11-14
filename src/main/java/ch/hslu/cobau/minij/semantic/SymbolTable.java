@@ -16,7 +16,7 @@ public class SymbolTable {
     public static class Scope {
 
         private final Scope parent;
-        private final Map<String, Symbol> symbols = new HashMap<>();
+        private final Map<String, VariableSymbol> symbols = new HashMap<>();
 
         /**
          * Creates a new scope with a parent scope.
@@ -33,7 +33,7 @@ public class SymbolTable {
          * @param symbol Symbol to add to scope (must not be null).
          * @return False if the symbol already exists in the current scope, true if not.
          */
-        public boolean addSymbol(Symbol symbol) {
+        public boolean addSymbol(VariableSymbol symbol) {
             return symbols.putIfAbsent(symbol.identifier(), symbol) == null;
         }
 
@@ -41,14 +41,13 @@ public class SymbolTable {
          * Returns the symbol if this or any parent scope contains the symbol.
          *
          * @param identifier The identifier of the symbol.
-         * @param entity     The entity of the symbol.
          * @return The symbol if this or any parent scope contains the symbol, null if not.
          */
-        public Symbol getSymbol(String identifier, SymbolEntity entity) {
+        public VariableSymbol getSymbol(String identifier) {
             Scope currentScope = this;
             do {
-                Symbol symbol = currentScope.symbols.get(identifier);
-                if (symbol != null && entity.equals(symbol.entity())) {
+                VariableSymbol symbol = currentScope.symbols.get(identifier);
+                if (symbol != null) {
                     return symbol;
                 }
                 currentScope = currentScope.parent;
@@ -60,11 +59,10 @@ public class SymbolTable {
          * Returns true if this or any parent scope contains the symbol.
          *
          * @param identifier The identifier of the symbol.
-         * @param entity     The entity of the symbol.
          * @return True if this or any parent scope contains the symbol, false if not.
          */
-        public boolean hasSymbol(String identifier, SymbolEntity entity) {
-            return getSymbol(identifier, entity) != null;
+        public boolean hasSymbol(String identifier) {
+            return getSymbol(identifier) != null;
         }
 
         /**
@@ -78,8 +76,8 @@ public class SymbolTable {
     }
 
     Map<AstElement, Scope> scopes = new HashMap<>();
-    Map<String, SymbolFunction> functions = new HashMap<>();
-    Map<String, SymbolStruct> structs = new HashMap<>();
+    Map<String, FunctionSymbol> functions = new HashMap<>();
+    Map<String, StructSymbol> structs = new HashMap<>();
 
     /**
      * Adds a scope for a specific element of the AST with a given parent.
@@ -109,9 +107,10 @@ public class SymbolTable {
      *
      * @param identifier The identifier of the function symbol.
      * @param function   The function symbol.
+     * @return False if the function symbol already exists, true if not.
      */
-    public void addFunction(String identifier, SymbolFunction function) {
-        functions.putIfAbsent(identifier, function);
+    public boolean addFunction(String identifier, FunctionSymbol function) {
+        return functions.putIfAbsent(identifier, function) == null;
     }
 
     /**
@@ -120,8 +119,18 @@ public class SymbolTable {
      * @param identifier The identifier of the function symbol.
      * @return The function symbol if it exists or null if not.
      */
-    public SymbolFunction getFunction(String identifier) {
+    public FunctionSymbol getFunction(String identifier) {
         return functions.get(identifier);
+    }
+
+    /**
+     * Returns true if the function symbol exists.
+     *
+     * @param identifier The identifier of the function symbol.
+     * @return True if the function symbol exists, false if not.
+     */
+    public boolean hasFunction(String identifier) {
+        return getFunction(identifier) != null;
     }
 
     /**
@@ -129,9 +138,10 @@ public class SymbolTable {
      *
      * @param identifier The identifier of the struct symbol.
      * @param struct     The struct symbol.
+     * @return False if the struct symbol already exists, true if not.
      */
-    public void addStruct(String identifier, SymbolStruct struct) {
-        structs.putIfAbsent(identifier, struct);
+    public boolean addStruct(String identifier, StructSymbol struct) {
+        return structs.putIfAbsent(identifier, struct) == null;
     }
 
     /**
@@ -140,7 +150,17 @@ public class SymbolTable {
      * @param identifier The identifier of the struct symbol.
      * @return The struct symbol if it exists or null if not.
      */
-    public SymbolStruct getStruct(String identifier) {
+    public StructSymbol getStruct(String identifier) {
         return structs.get(identifier);
+    }
+
+    /**
+     * Returns true if the struct symbol exists.
+     *
+     * @param identifier The identifier of the struct symbol.
+     * @return True if the struct symbol exists, false if not.
+     */
+    public boolean hasStruct(String identifier) {
+        return getStruct(identifier) != null;
     }
 }

@@ -66,14 +66,8 @@ public class SemanticAnalyser extends BaseAstVisitor {
             errorListener.semanticError("type of '" + declaration.getIdentifier() + "' must not be void");
         }
 
-        SymbolTable.Scope scope = symbolTable.getScope(declaration);
-        if (scope == null) {
-            errorListener.semanticError("scope for '" + declaration.getIdentifier() + "' not found");
-            return;
-        }
-
         if (declaration.getType() instanceof RecordType type) {
-            if (!scope.hasSymbol(type.getIdentifier(), SymbolEntity.STRUCT)) {
+            if (!symbolTable.hasStruct(type.getIdentifier())) {
                 errorListener.semanticError("struct type '" + type.getIdentifier() + "' not found");
             }
         }
@@ -83,14 +77,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
     public void visit(CallExpression call) {
         super.visit(call);
 
-        SymbolTable.Scope scope = symbolTable.getScope(call);
-        if (scope == null) {
-            errorListener.semanticError("scope for '" + call.getIdentifier() + "' not found");
-            return;
-        }
-
-        Symbol symbol = scope.getSymbol(call.getIdentifier(), SymbolEntity.FUNCTION);
-        if (symbol == null) {
+        if (!symbolTable.hasFunction(call.getIdentifier())) {
             errorListener.semanticError("function '" + call.getIdentifier() + "' not found");
             return;
         }
@@ -112,7 +99,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
             return;
         }
 
-        if (!scope.hasSymbol(variable.getIdentifier(), SymbolEntity.DECLARATION)) {
+        if (!scope.hasSymbol(variable.getIdentifier())) {
             errorListener.semanticError("variable '" + variable.getIdentifier() + "' not found");
         }
     }
@@ -128,9 +115,9 @@ public class SemanticAnalyser extends BaseAstVisitor {
         }
 
         VariableAccess variable = (VariableAccess) field.getBase();
-        Symbol declaration = scope.getSymbol(variable.getIdentifier(), SymbolEntity.DECLARATION);
+        VariableSymbol declaration = scope.getSymbol(variable.getIdentifier());
         if (declaration != null && declaration.type() instanceof RecordType type) {
-            SymbolStruct struct = symbolTable.getStruct(type.getIdentifier());
+            StructSymbol struct = symbolTable.getStruct(type.getIdentifier());
             if (struct != null && !struct.fields().containsKey(field.getField())) {
                 errorListener.semanticError("field '" + field.getField() + "' not found");
             }

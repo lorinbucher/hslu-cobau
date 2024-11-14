@@ -1,21 +1,22 @@
 package ch.hslu.cobau.minij.semantic;
 
+import ch.hslu.cobau.minij.ast.type.RecordType;
 import ch.hslu.cobau.minij.ast.type.Type;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
- * Represents a function symbol in the symbol table of the MiniJ language.
+ * Represents a struct symbol in the symbol table of the MiniJ language.
  *
- * @param identifier The identifier of the function symbol.
- * @param returnType The return type of the function symbol.
- * @param paramTypes The parameter types of the function symbol.
+ * @param identifier The identifier of the struct symbol.
+ * @param type       The type of the struct symbol.
+ * @param fields     The fields of the struct symbol.
  */
-public record SymbolFunction(String identifier, Type returnType, List<Type> paramTypes) {
+public record StructSymbol(String identifier, RecordType type, Map<String, Type> fields) {
 
     /**
-     * A function symbol is equal if the identifier is the same.
+     * A struct symbol is equal if the identifier is the same.
      *
      * @param o Another object to compare to.
      * @return True if the other object is equal, false if not.
@@ -23,7 +24,7 @@ public record SymbolFunction(String identifier, Type returnType, List<Type> para
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SymbolFunction symbol)) return false;
+        if (!(o instanceof StructSymbol symbol)) return false;
 
         return Objects.equals(identifier, symbol.identifier);
     }

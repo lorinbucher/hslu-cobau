@@ -39,21 +39,19 @@ public class SymbolTableBuilder extends BaseAstVisitor {
 
     @Override
     public void visit(Function function) {
-        addSymbol(new Symbol(function.getIdentifier(), SymbolEntity.FUNCTION, function.getReturnType(), function));
         currentScope = symbolTable.addScope(function, currentScope);
         super.visit(function);
         currentScope = currentScope.getParent();
 
-        if (!function.getIdentifier().equals("main")) {
-            List<Type> paramTypes = function.getFormalParameters().stream().map(Declaration::getType).toList();
-            SymbolFunction symbol = new SymbolFunction(function.getIdentifier(), function.getReturnType(), paramTypes);
-            symbolTable.addFunction(function.getIdentifier(), symbol);
+        List<Type> paramTypes = function.getFormalParameters().stream().map(Declaration::getType).toList();
+        FunctionSymbol symbol = new FunctionSymbol(function.getIdentifier(), function.getReturnType(), paramTypes);
+        if (!symbolTable.addFunction(function.getIdentifier(), symbol)) {
+            errorListener.semanticError("symbol '" + symbol.identifier() + "' already declared");
         }
     }
 
     @Override
     public void visit(Struct struct) {
-        addSymbol(new Symbol(struct.getIdentifier(), SymbolEntity.STRUCT, null, struct));
         currentScope = symbolTable.addScope(struct, currentScope);
         super.visit(struct);
         currentScope = currentScope.getParent();
@@ -64,13 +62,18 @@ public class SymbolTableBuilder extends BaseAstVisitor {
                         Declaration::getType,
                         (type1, type2) -> type1
                 ));
-        SymbolStruct symbol = new SymbolStruct(struct.getIdentifier(), new RecordType(struct.getIdentifier()), fields);
-        symbolTable.addStruct(struct.getIdentifier(), symbol);
+        StructSymbol symbol = new StructSymbol(struct.getIdentifier(), new RecordType(struct.getIdentifier()), fields);
+        if (!symbolTable.addStruct(struct.getIdentifier(), symbol)) {
+            errorListener.semanticError("symbol '" + symbol.identifier() + "' already declared");
+        }
     }
 
     @Override
     public void visit(Declaration declaration) {
-        addSymbol(new Symbol(declaration.getIdentifier(), SymbolEntity.DECLARATION, declaration.getType(), declaration));
+        VariableSymbol symbol = new VariableSymbol(declaration.getIdentifier(), declaration.getType(), declaration);
+        if (!currentScope.addSymbol(symbol)) {
+            errorListener.semanticError("symbol '" + symbol.identifier() + "' already declared");
+        }
         currentScope = symbolTable.addScope(declaration, currentScope);
         super.visit(declaration);
         currentScope = currentScope.getParent();
@@ -188,27 +191,12 @@ public class SymbolTableBuilder extends BaseAstVisitor {
     }
 
     /**
-     * Adds a symbol to the current scope of the symbol table.
-     *
-     * @param symbol The symbol to add.
-     */
-    private void addSymbol(Symbol symbol) {
-        if (!currentScope.addSymbol(symbol)) {
-            errorListener.semanticError("symbol '" + symbol.identifier() + "' already declared");
-        }
-    }
-
-    /**
      * Adds the built-in functions.
      */
     private void addBuiltInFunctions() {
-        addSymbol(new Symbol("writeInt", SymbolEntity.FUNCTION, new VoidType(), null));
-        addSymbol(new Symbol("readInt", SymbolEntity.FUNCTION, new IntegerType(), null));
-        addSymbol(new Symbol("writeChar", SymbolEntity.FUNCTION, new VoidType(), null));
-        addSymbol(new Symbol("readChar", SymbolEntity.FUNCTION, new IntegerType(), null));
-        symbolTable.addFunction("writeInt", new SymbolFunction("writeInt", new VoidType(), List.of(new IntegerType())));
-        symbolTable.addFunction("readInt", new SymbolFunction("readInt", new IntegerType(), List.of()));
-        symbolTable.addFunction("writeChar", new SymbolFunction("writeChar", new VoidType(), List.of(new IntegerType())));
-        symbolTable.addFunction("readChar", new SymbolFunction("readChar", new IntegerType(), List.of()));
+        symbolTable.addFunction("writeInt", new FunctionSymbol("writeInt", new VoidType(), List.of(new IntegerType())));
+        symbolTable.addFunction("readInt", new FunctionSymbol("readInt", new IntegerType(), List.of()));
+        symbolTable.addFunction("writeChar", new FunctionSymbol("writeChar", new VoidType(), List.of(new IntegerType())));
+        symbolTable.addFunction("readChar", new FunctionSymbol("readChar", new IntegerType(), List.of()));
     }
 }
