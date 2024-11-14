@@ -95,7 +95,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
             return;
         }
 
-        int paramCount = ((Function) symbol.astElement()).getFormalParameters().size();
+        int paramCount = symbolTable.getFunction(call.getIdentifier()).paramTypes().size();
         if (paramCount != call.getParameters().size()) {
             errorListener.semanticError("function '" + call.getIdentifier() + "' expects " + paramCount
                     + " parameters but " + call.getParameters().size() + " were given");
@@ -130,11 +130,9 @@ public class SemanticAnalyser extends BaseAstVisitor {
         VariableAccess variable = (VariableAccess) field.getBase();
         Symbol declaration = scope.getSymbol(variable.getIdentifier(), SymbolEntity.DECLARATION);
         if (declaration != null && declaration.type() instanceof RecordType type) {
-            Symbol struct = scope.getSymbol(type.getIdentifier(), SymbolEntity.STRUCT);
-            if (struct != null) {
-                if (!symbolTable.getScope(struct.astElement()).hasSymbol(field.getField(), SymbolEntity.DECLARATION)) {
-                    errorListener.semanticError("field '" + field.getField() + "' not found");
-                }
+            SymbolStruct struct = symbolTable.getStruct(type.getIdentifier());
+            if (struct != null && !struct.fields().containsKey(field.getField())) {
+                errorListener.semanticError("field '" + field.getField() + "' not found");
             }
         } else {
             errorListener.semanticError("variable '" + variable.getIdentifier() + "' is not a struct");

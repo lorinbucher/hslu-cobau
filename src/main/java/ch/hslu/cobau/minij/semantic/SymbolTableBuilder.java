@@ -7,6 +7,11 @@ import ch.hslu.cobau.minij.ast.entity.*;
 import ch.hslu.cobau.minij.ast.expression.*;
 import ch.hslu.cobau.minij.ast.statement.*;
 import ch.hslu.cobau.minij.ast.type.RecordType;
+import ch.hslu.cobau.minij.ast.type.Type;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Builds the symbol table for the MiniJ language.
@@ -38,6 +43,12 @@ public class SymbolTableBuilder extends BaseAstVisitor {
         currentScope = symbolTable.addScope(function, currentScope);
         super.visit(function);
         currentScope = currentScope.getParent();
+
+        if (!function.getIdentifier().equals("main")) {
+            List<Type> paramTypes = function.getFormalParameters().stream().map(Declaration::getType).toList();
+            SymbolFunction symbol = new SymbolFunction(function.getIdentifier(), function.getReturnType(), paramTypes);
+            symbolTable.addFunction(function.getIdentifier(), symbol);
+        }
     }
 
     @Override
@@ -46,6 +57,15 @@ public class SymbolTableBuilder extends BaseAstVisitor {
         currentScope = symbolTable.addScope(struct, currentScope);
         super.visit(struct);
         currentScope = currentScope.getParent();
+
+        Map<String, Type> fields = struct.getDeclarations().stream()
+                .collect(Collectors.toMap(
+                        Declaration::getIdentifier,
+                        Declaration::getType,
+                        (type1, type2) -> type1
+                ));
+        SymbolStruct symbol = new SymbolStruct(struct.getIdentifier(), new RecordType(struct.getIdentifier()), fields);
+        symbolTable.addStruct(struct.getIdentifier(), symbol);
     }
 
     @Override

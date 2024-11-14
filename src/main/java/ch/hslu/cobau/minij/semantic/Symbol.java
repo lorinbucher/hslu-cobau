@@ -16,7 +16,7 @@ import java.util.Objects;
 public record Symbol(String identifier, SymbolEntity entity, Type type, AstElement astElement) {
 
     /**
-     * A symbol is equal if the identifier is the same.
+     * A symbol is equal if the identifier and the entity are the same.
      *
      * @param o Another object to compare to.
      * @return True if the other object is equal, false if not.
@@ -31,7 +31,7 @@ public record Symbol(String identifier, SymbolEntity entity, Type type, AstEleme
     }
 
     /**
-     * Calculates the hashcode only based on the identifier.
+     * Calculates the hashcode based on the identifier and the entity.
      *
      * @return The hashcode.
      */

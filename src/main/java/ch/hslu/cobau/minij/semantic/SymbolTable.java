@@ -77,8 +77,9 @@ public class SymbolTable {
         }
     }
 
-    // mapping of scope to an element of the AST
     Map<AstElement, Scope> scopes = new HashMap<>();
+    Map<String, SymbolFunction> functions = new HashMap<>();
+    Map<String, SymbolStruct> structs = new HashMap<>();
 
     /**
      * Adds a scope for a specific element of the AST with a given parent.
@@ -101,5 +102,45 @@ public class SymbolTable {
      */
     public Scope getScope(AstElement element) {
         return scopes.get(element);
+    }
+
+    /**
+     * Adds a function symbol to the symbol table.
+     *
+     * @param identifier The identifier of the function symbol.
+     * @param function   The function symbol.
+     */
+    public void addFunction(String identifier, SymbolFunction function) {
+        functions.putIfAbsent(identifier, function);
+    }
+
+    /**
+     * Returns the function symbol for a given identifier.
+     *
+     * @param identifier The identifier of the function symbol.
+     * @return The function symbol if it exists or null if not.
+     */
+    public SymbolFunction getFunction(String identifier) {
+        return functions.get(identifier);
+    }
+
+    /**
+     * Adds a struct symbol to the symbol table.
+     *
+     * @param identifier The identifier of the struct symbol.
+     * @param struct     The struct symbol.
+     */
+    public void addStruct(String identifier, SymbolStruct struct) {
+        structs.putIfAbsent(identifier, struct);
+    }
+
+    /**
+     * Returns the struct symbol for a given identifier.
+     *
+     * @param identifier The identifier of the struct symbol.
+     * @return The struct symbol if it exists or null if not.
+     */
+    public SymbolStruct getStruct(String identifier) {
+        return structs.get(identifier);
     }
 }
