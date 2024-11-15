@@ -75,6 +75,10 @@ public class SemanticAnalyser extends BaseAstVisitor {
     @Override
     public void visit(ReturnStatement returnStatement) {
         super.visit(returnStatement);
+
+        if (returnStatement.getExpression() != null) {
+            tyeStack.pop();
+        }
     }
 
     @Override
@@ -83,14 +87,10 @@ public class SemanticAnalyser extends BaseAstVisitor {
         Type right = tyeStack.pop();
         Type left = tyeStack.pop();
         if (!(right instanceof InvalidType) && !(left instanceof InvalidType)) {
-            if (right.getClass() == left.getClass()) {
-                tyeStack.push(right);
-                return;
-            } else {
+            if (right.getClass() != left.getClass()) {
                 errorListener.semanticError("type mismatch '" + left + "' -> '" + right + "'");
             }
         }
-        tyeStack.push(new InvalidType());
     }
 
     @Override
@@ -101,16 +101,32 @@ public class SemanticAnalyser extends BaseAstVisitor {
     @Override
     public void visit(CallStatement callStatement) {
         super.visit(callStatement);
+
+        tyeStack.pop();
     }
 
     @Override
     public void visit(IfStatement ifStatement) {
         super.visit(ifStatement);
+
+        Type type = tyeStack.pop();
+        if (!(type instanceof InvalidType)) {
+            if (!(type instanceof BooleanType)) {
+                errorListener.semanticError(new BooleanType() + " type required but " + type + " provided");
+            }
+        }
     }
 
     @Override
     public void visit(WhileStatement whileStatement) {
         super.visit(whileStatement);
+
+        Type type = tyeStack.pop();
+        if (!(type instanceof InvalidType)) {
+            if (!(type instanceof BooleanType)) {
+                errorListener.semanticError(new BooleanType() + " type required but " + type + " provided");
+            }
+        }
     }
 
     @Override
@@ -121,11 +137,82 @@ public class SemanticAnalyser extends BaseAstVisitor {
     @Override
     public void visit(UnaryExpression unaryExpression) {
         super.visit(unaryExpression);
+
+        Type type = tyeStack.pop();
+        if (!(type instanceof InvalidType)) {
+            if (unaryExpression.getUnaryOperator() == UnaryOperator.NOT) {
+                if (!(type instanceof BooleanType)) {
+                    errorListener.semanticError(UnaryOperator.NOT + " requires boolean type");
+                    type = new InvalidType();
+                }
+            } else {
+                if (!(type instanceof IntegerType)) {
+                    errorListener.semanticError(unaryExpression.getUnaryOperator() + " requires integer type");
+                    type = new InvalidType();
+                }
+            }
+        }
+        tyeStack.push(type);
     }
 
     @Override
     public void visit(BinaryExpression binaryExpression) {
         super.visit(binaryExpression);
+
+        Type right = tyeStack.pop();
+        Type left = tyeStack.pop();
+        if (!(right instanceof InvalidType) && !(left instanceof InvalidType)) {
+            if (right.getClass() == left.getClass()) {
+                BinaryOperator binaryOp = binaryExpression.getBinaryOperator();
+                switch (binaryOp) {
+                    case PLUS:
+                        if (!(left instanceof IntegerType || left instanceof StringType)) {
+                            errorListener.semanticError(binaryOp + " requires integer or string type");
+                            tyeStack.push(new InvalidType());
+                        } else {
+                            tyeStack.push(left);
+                        }
+                        break;
+                    case MINUS, TIMES, DIV, MOD:
+                        if (!(left instanceof IntegerType)) {
+                            errorListener.semanticError(binaryOp + " requires integer type");
+                            tyeStack.push(new InvalidType());
+                        } else {
+                            tyeStack.push(left);
+                        }
+                        break;
+                    case EQUAL, UNEQUAL:
+                        if (!(left instanceof IntegerType || left instanceof StringType || left instanceof BooleanType)) {
+                            errorListener.semanticError(binaryOp + " requires integer, string or boolean type");
+                            tyeStack.push(new InvalidType());
+                        } else {
+                            tyeStack.push(new BooleanType());
+                        }
+                        break;
+                    case LESSER, LESSER_EQ, GREATER, GREATER_EQ:
+                        if (!(left instanceof IntegerType || left instanceof StringType)) {
+                            errorListener.semanticError(binaryOp + " requires integer or string type");
+                            tyeStack.push(new InvalidType());
+                        } else {
+                            tyeStack.push(new BooleanType());
+                        }
+                        break;
+                    case AND, OR:
+                        if (!(left instanceof BooleanType)) {
+                            errorListener.semanticError(binaryOp + " requires boolean type");
+                            tyeStack.push(new InvalidType());
+                        } else {
+                            tyeStack.push(left);
+                        }
+                        break;
+                }
+            } else {
+                errorListener.semanticError("type mismatch '" + left + "' -> '" + right + "'");
+                tyeStack.push(new InvalidType());
+            }
+        } else {
+            tyeStack.push(new InvalidType());
+        }
     }
 
     @Override
