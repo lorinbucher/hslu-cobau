@@ -17,7 +17,8 @@ public class SemanticAnalyser extends BaseAstVisitor {
 
     private final EnhancedConsoleErrorListener errorListener;
     private final SymbolTable symbolTable;
-    private final Stack<Type> tyeStack = new Stack<>();
+    private final Stack<Type> returnStack = new Stack<>();
+    private final Stack<Type> typeStack = new Stack<>();
 
     /**
      * Creates an instance of the semantic analyzer for the MiniJ language.
@@ -41,17 +42,16 @@ public class SemanticAnalyser extends BaseAstVisitor {
             if (!(function.getReturnType() instanceof IntegerType)) {
                 errorListener.semanticError("main function must have return type integer");
             }
+        } else {
+            if (returnStack.empty() && !(function.getReturnType() instanceof VoidType)) {
+                errorListener.semanticError("function '" + function.getIdentifier() + "' must return a value");
+            }
         }
 
-        // TODO (lorin): improve after type checking implementation
-        for (Statement statement : function.getStatements()) {
-            if (statement instanceof ReturnStatement returnStatement) {
-                if (function.getReturnType() instanceof VoidType && returnStatement.getExpression() != null) {
-                    errorListener.semanticError("function '" + function.getIdentifier() + "' must not return a value");
-                }
-                if (!(function.getReturnType() instanceof VoidType) && returnStatement.getExpression() == null) {
-                    errorListener.semanticError("function '" + function.getIdentifier() + "' must return a value");
-                }
+        while (!returnStack.empty()) {
+            if (!function.getReturnType().equals(returnStack.pop())) {
+                errorListener.semanticError("function '" + function.getIdentifier() + "' return type mismatch");
+                returnStack.clear();
             }
         }
     }
@@ -75,17 +75,18 @@ public class SemanticAnalyser extends BaseAstVisitor {
     @Override
     public void visit(ReturnStatement returnStatement) {
         super.visit(returnStatement);
-
         if (returnStatement.getExpression() != null) {
-            tyeStack.pop();
+            returnStack.push(typeStack.pop());
+        } else {
+            returnStack.push(new VoidType());
         }
     }
 
     @Override
     public void visit(AssignmentStatement assignment) {
         super.visit(assignment);
-        Type right = tyeStack.pop();
-        Type left = tyeStack.pop();
+        Type right = typeStack.pop();
+        Type left = typeStack.pop();
         if (!(right instanceof InvalidType) && !(left instanceof InvalidType)) {
             if (!right.equals(left)) {
                 errorListener.semanticError("type mismatch '" + left + "' -> '" + right + "'");
@@ -96,14 +97,14 @@ public class SemanticAnalyser extends BaseAstVisitor {
     @Override
     public void visit(CallStatement callStatement) {
         super.visit(callStatement);
-        tyeStack.pop();
+        typeStack.pop();
     }
 
     @Override
     public void visit(IfStatement ifStatement) {
         super.visit(ifStatement);
 
-        Type type = tyeStack.pop();
+        Type type = typeStack.pop();
         if (!(type instanceof InvalidType)) {
             if (!(type instanceof BooleanType)) {
                 errorListener.semanticError(new BooleanType() + " type required but " + type + " provided");
@@ -115,7 +116,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
     public void visit(WhileStatement whileStatement) {
         super.visit(whileStatement);
 
-        Type type = tyeStack.pop();
+        Type type = typeStack.pop();
         if (!(type instanceof InvalidType)) {
             if (!(type instanceof BooleanType)) {
                 errorListener.semanticError(new BooleanType() + " type required but " + type + " provided");
@@ -127,7 +128,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
     public void visit(UnaryExpression unaryExpression) {
         super.visit(unaryExpression);
 
-        Type type = tyeStack.pop();
+        Type type = typeStack.pop();
         if (!(type instanceof InvalidType)) {
             if (unaryExpression.getUnaryOperator() == UnaryOperator.NOT) {
                 if (!(type instanceof BooleanType)) {
@@ -141,15 +142,15 @@ public class SemanticAnalyser extends BaseAstVisitor {
                 }
             }
         }
-        tyeStack.push(type);
+        typeStack.push(type);
     }
 
     @Override
     public void visit(BinaryExpression binaryExpression) {
         super.visit(binaryExpression);
 
-        Type right = tyeStack.pop();
-        Type left = tyeStack.pop();
+        Type right = typeStack.pop();
+        Type left = typeStack.pop();
         if (!(right instanceof InvalidType) && !(left instanceof InvalidType)) {
             if (right.equals(left)) {
                 BinaryOperator binaryOp = binaryExpression.getBinaryOperator();
@@ -157,50 +158,50 @@ public class SemanticAnalyser extends BaseAstVisitor {
                     case PLUS:
                         if (!(left instanceof IntegerType || left instanceof StringType)) {
                             errorListener.semanticError(binaryOp + " requires integer or string type");
-                            tyeStack.push(new InvalidType());
+                            typeStack.push(new InvalidType());
                         } else {
-                            tyeStack.push(left);
+                            typeStack.push(left);
                         }
                         break;
                     case MINUS, TIMES, DIV, MOD:
                         if (!(left instanceof IntegerType)) {
                             errorListener.semanticError(binaryOp + " requires integer type");
-                            tyeStack.push(new InvalidType());
+                            typeStack.push(new InvalidType());
                         } else {
-                            tyeStack.push(left);
+                            typeStack.push(left);
                         }
                         break;
                     case EQUAL, UNEQUAL:
                         if (!(left instanceof IntegerType || left instanceof StringType || left instanceof BooleanType)) {
                             errorListener.semanticError(binaryOp + " requires integer, string or boolean type");
-                            tyeStack.push(new InvalidType());
+                            typeStack.push(new InvalidType());
                         } else {
-                            tyeStack.push(new BooleanType());
+                            typeStack.push(new BooleanType());
                         }
                         break;
                     case LESSER, LESSER_EQ, GREATER, GREATER_EQ:
                         if (!(left instanceof IntegerType || left instanceof StringType)) {
                             errorListener.semanticError(binaryOp + " requires integer or string type");
-                            tyeStack.push(new InvalidType());
+                            typeStack.push(new InvalidType());
                         } else {
-                            tyeStack.push(new BooleanType());
+                            typeStack.push(new BooleanType());
                         }
                         break;
                     case AND, OR:
                         if (!(left instanceof BooleanType)) {
                             errorListener.semanticError(binaryOp + " requires boolean type");
-                            tyeStack.push(new InvalidType());
+                            typeStack.push(new InvalidType());
                         } else {
-                            tyeStack.push(left);
+                            typeStack.push(left);
                         }
                         break;
                 }
             } else {
                 errorListener.semanticError("type mismatch '" + left + "' -> '" + right + "'");
-                tyeStack.push(new InvalidType());
+                typeStack.push(new InvalidType());
             }
         } else {
-            tyeStack.push(new InvalidType());
+            typeStack.push(new InvalidType());
         }
     }
 
@@ -211,7 +212,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
         FunctionSymbol symbol = symbolTable.getFunction(callExpression.getIdentifier());
         if (symbol == null) {
             errorListener.semanticError("function '" + callExpression.getIdentifier() + "' not found");
-            tyeStack.push(new InvalidType());
+            typeStack.push(new InvalidType());
             return;
         }
 
@@ -222,7 +223,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
         }
 
         for (int i = 0; i < callExpression.getParameters().size(); i++) {
-            Type type = tyeStack.pop();
+            Type type = typeStack.pop();
             if (!(type instanceof InvalidType) && symbol.paramTypes().size() > i) {
                 if (!type.equals(symbol.paramTypes().get(i))) {
                     errorListener.semanticError("function parameter type mismatch");
@@ -230,7 +231,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
             }
         }
 
-        tyeStack.push(symbol.returnType());
+        typeStack.push(symbol.returnType());
     }
 
     @Override
@@ -240,16 +241,16 @@ public class SemanticAnalyser extends BaseAstVisitor {
         SymbolTable.Scope scope = symbolTable.getScope(variable);
         if (scope == null) {
             errorListener.semanticError("scope for '" + variable.getIdentifier() + "' not found");
-            tyeStack.push(new InvalidType());
+            typeStack.push(new InvalidType());
             return;
         }
 
         VariableSymbol symbol = scope.getSymbol(variable.getIdentifier());
         if (symbol != null) {
-            tyeStack.push(symbol.type());
+            typeStack.push(symbol.type());
         } else {
             errorListener.semanticError("variable '" + variable.getIdentifier() + "' not found");
-            tyeStack.push(new InvalidType());
+            typeStack.push(new InvalidType());
         }
     }
 
@@ -257,24 +258,24 @@ public class SemanticAnalyser extends BaseAstVisitor {
     public void visit(ArrayAccess arrayAccess) {
         super.visit(arrayAccess);
 
-        Type accessType = tyeStack.pop();
-        Type variableType = tyeStack.pop();
+        Type accessType = typeStack.pop();
+        Type variableType = typeStack.pop();
         if (accessType instanceof InvalidType || variableType instanceof InvalidType) {
-            tyeStack.push(new InvalidType());
+            typeStack.push(new InvalidType());
             return;
         }
 
         if (!(accessType instanceof IntegerType)) {
             errorListener.semanticError("array access requires integer type");
-            tyeStack.push(new InvalidType());
+            typeStack.push(new InvalidType());
             return;
         }
 
         if (variableType instanceof ArrayType type) {
-            tyeStack.push(type.getType());
+            typeStack.push(type.getType());
         } else {
             errorListener.semanticError("variable is not a an array type");
-            tyeStack.push(new InvalidType());
+            typeStack.push(new InvalidType());
         }
     }
 
@@ -282,43 +283,43 @@ public class SemanticAnalyser extends BaseAstVisitor {
     public void visit(FieldAccess fieldAccess) {
         super.visit(fieldAccess);
 
-        if (tyeStack.peek() instanceof InvalidType) {
+        if (typeStack.peek() instanceof InvalidType) {
             return;
         }
 
-        if (tyeStack.pop() instanceof RecordType type) {
+        if (typeStack.pop() instanceof RecordType type) {
             StructSymbol symbol = symbolTable.getStruct(type.getIdentifier());
             if (symbol != null && symbol.fields().containsKey(fieldAccess.getField())) {
-                tyeStack.push(symbol.fields().get(fieldAccess.getField()));
+                typeStack.push(symbol.fields().get(fieldAccess.getField()));
                 return;
             }
         }
 
         errorListener.semanticError("field '" + fieldAccess.getField() + "' not found");
-        tyeStack.push(new InvalidType());
+        typeStack.push(new InvalidType());
     }
 
     @Override
     public void visit(FalseConstant falseConstant) {
         super.visit(falseConstant);
-        tyeStack.push(new BooleanType());
+        typeStack.push(new BooleanType());
     }
 
     @Override
     public void visit(IntegerConstant integerConstant) {
         super.visit(integerConstant);
-        tyeStack.push(new IntegerType());
+        typeStack.push(new IntegerType());
     }
 
     @Override
     public void visit(StringConstant stringConstant) {
         super.visit(stringConstant);
-        tyeStack.push(new StringType());
+        typeStack.push(new StringType());
     }
 
     @Override
     public void visit(TrueConstant trueConstant) {
         super.visit(trueConstant);
-        tyeStack.push(new BooleanType());
+        typeStack.push(new BooleanType());
     }
 }
