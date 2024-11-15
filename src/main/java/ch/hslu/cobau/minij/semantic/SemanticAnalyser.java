@@ -82,7 +82,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
         super.visit(assignment);
         Type right = tyeStack.pop();
         Type left = tyeStack.pop();
-        if (right.getClass() != InvalidType.class || left.getClass() != InvalidType.class) {
+        if (!(right instanceof InvalidType) && !(left instanceof InvalidType)) {
             if (right.getClass() == left.getClass()) {
                 tyeStack.push(right);
                 return;
@@ -143,6 +143,15 @@ public class SemanticAnalyser extends BaseAstVisitor {
             errorListener.semanticError("function '" + callExpression.getIdentifier() + "' expects "
                     + symbol.paramTypes().size() + " parameters but "
                     + callExpression.getParameters().size() + " were given");
+        }
+
+        for (int i = 0; i < callExpression.getParameters().size(); i++) {
+            Type type = tyeStack.pop();
+            if (!(type instanceof InvalidType) && symbol.paramTypes().size() > i) {
+                if (type.getClass() != symbol.paramTypes().get(i).getClass()) {
+                    errorListener.semanticError("function parameter type mismatch");
+                }
+            }
         }
 
         tyeStack.push(symbol.returnType());

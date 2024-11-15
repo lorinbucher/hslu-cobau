@@ -43,7 +43,7 @@ public class SymbolTableBuilder extends BaseAstVisitor {
         super.visit(function);
         currentScope = currentScope.getParent();
 
-        List<Type> paramTypes = function.getFormalParameters().stream().map(Declaration::getType).toList();
+        List<Type> paramTypes = function.getFormalParameters().stream().map(Declaration::getType).toList().reversed();
         FunctionSymbol symbol = new FunctionSymbol(function.getIdentifier(), function.getReturnType(), paramTypes);
         if (!symbolTable.addFunction(function.getIdentifier(), symbol)) {
             errorListener.semanticError("symbol '" + symbol.identifier() + "' already declared");
