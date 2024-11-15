@@ -38,7 +38,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
             if (!function.getFormalParameters().isEmpty()) {
                 errorListener.semanticError("main function must not have any parameters");
             }
-            if (!function.getReturnType().getClass().equals(IntegerType.class)) {
+            if (!(function.getReturnType() instanceof IntegerType)) {
                 errorListener.semanticError("main function must have return type integer");
             }
         }
@@ -87,7 +87,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
         Type right = tyeStack.pop();
         Type left = tyeStack.pop();
         if (!(right instanceof InvalidType) && !(left instanceof InvalidType)) {
-            if (right.getClass() != left.getClass()) {
+            if (!right.equals(left)) {
                 errorListener.semanticError("type mismatch '" + left + "' -> '" + right + "'");
             }
         }
@@ -161,7 +161,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
         Type right = tyeStack.pop();
         Type left = tyeStack.pop();
         if (!(right instanceof InvalidType) && !(left instanceof InvalidType)) {
-            if (right.getClass() == left.getClass()) {
+            if (right.equals(left)) {
                 BinaryOperator binaryOp = binaryExpression.getBinaryOperator();
                 switch (binaryOp) {
                     case PLUS:
@@ -234,7 +234,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
         for (int i = 0; i < callExpression.getParameters().size(); i++) {
             Type type = tyeStack.pop();
             if (!(type instanceof InvalidType) && symbol.paramTypes().size() > i) {
-                if (type.getClass() != symbol.paramTypes().get(i).getClass()) {
+                if (!type.equals(symbol.paramTypes().get(i))) {
                     errorListener.semanticError("function parameter type mismatch");
                 }
             }
