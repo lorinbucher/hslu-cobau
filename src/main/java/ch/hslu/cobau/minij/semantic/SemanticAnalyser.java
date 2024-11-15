@@ -101,7 +101,6 @@ public class SemanticAnalyser extends BaseAstVisitor {
     @Override
     public void visit(CallStatement callStatement) {
         super.visit(callStatement);
-
         tyeStack.pop();
     }
 
@@ -267,6 +266,26 @@ public class SemanticAnalyser extends BaseAstVisitor {
     @Override
     public void visit(ArrayAccess arrayAccess) {
         super.visit(arrayAccess);
+
+        Type accessType = tyeStack.pop();
+        Type variableType = tyeStack.pop();
+        if (accessType instanceof InvalidType || variableType instanceof InvalidType) {
+            tyeStack.push(new InvalidType());
+            return;
+        }
+
+        if (!(accessType instanceof IntegerType)) {
+            errorListener.semanticError("array access requires integer type");
+            tyeStack.push(new InvalidType());
+            return;
+        }
+
+        if (variableType instanceof ArrayType type) {
+            tyeStack.push(type.getType());
+        } else {
+            errorListener.semanticError("variable is not a an array type");
+            tyeStack.push(new InvalidType());
+        }
     }
 
     @Override
