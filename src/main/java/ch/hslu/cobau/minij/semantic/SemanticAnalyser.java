@@ -273,25 +273,19 @@ public class SemanticAnalyser extends BaseAstVisitor {
     public void visit(FieldAccess fieldAccess) {
         super.visit(fieldAccess);
 
-        SymbolTable.Scope scope = symbolTable.getScope(fieldAccess);
-        if (scope == null) {
-            errorListener.semanticError("scope for '" + fieldAccess.getField() + "' not found");
-            tyeStack.push(new InvalidType());
+        if (tyeStack.peek() instanceof InvalidType) {
             return;
         }
 
-        VariableAccess variable = (VariableAccess) fieldAccess.getBase();
-        VariableSymbol declaration = scope.getSymbol(variable.getIdentifier());
-        if (declaration != null && declaration.type() instanceof RecordType type) {
-            StructSymbol struct = symbolTable.getStruct(type.getIdentifier());
-            if (struct != null && struct.fields().containsKey(fieldAccess.getField())) {
-                tyeStack.push(struct.fields().get(fieldAccess.getField()));
+        if (tyeStack.pop() instanceof RecordType type) {
+            StructSymbol symbol = symbolTable.getStruct(type.getIdentifier());
+            if (symbol != null && symbol.fields().containsKey(fieldAccess.getField())) {
+                tyeStack.push(symbol.fields().get(fieldAccess.getField()));
                 return;
             }
-            errorListener.semanticError("field '" + fieldAccess.getField() + "' not found");
-        } else {
-            errorListener.semanticError("variable '" + variable.getIdentifier() + "' is not a struct");
         }
+
+        errorListener.semanticError("field '" + fieldAccess.getField() + "' not found");
         tyeStack.push(new InvalidType());
     }
 
