@@ -2,16 +2,13 @@ package ch.hslu.cobau.minij.semantic;
 
 import ch.hslu.cobau.minij.EnhancedConsoleErrorListener;
 import ch.hslu.cobau.minij.ast.BaseAstVisitor;
-import ch.hslu.cobau.minij.ast.entity.Declaration;
-import ch.hslu.cobau.minij.ast.entity.Function;
-import ch.hslu.cobau.minij.ast.expression.CallExpression;
-import ch.hslu.cobau.minij.ast.expression.FieldAccess;
-import ch.hslu.cobau.minij.ast.expression.VariableAccess;
-import ch.hslu.cobau.minij.ast.statement.ReturnStatement;
-import ch.hslu.cobau.minij.ast.statement.Statement;
-import ch.hslu.cobau.minij.ast.type.IntegerType;
-import ch.hslu.cobau.minij.ast.type.RecordType;
-import ch.hslu.cobau.minij.ast.type.VoidType;
+import ch.hslu.cobau.minij.ast.constants.*;
+import ch.hslu.cobau.minij.ast.entity.*;
+import ch.hslu.cobau.minij.ast.expression.*;
+import ch.hslu.cobau.minij.ast.statement.*;
+import ch.hslu.cobau.minij.ast.type.*;
+
+import java.util.Stack;
 
 /**
  * Implements the semantic analysis for the MiniJ language.
@@ -20,6 +17,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
 
     private final EnhancedConsoleErrorListener errorListener;
     private final SymbolTable symbolTable;
+    private final Stack<Type> tyeStack = new Stack<>();
 
     /**
      * Creates an instance of the semantic analyzer for the MiniJ language.
@@ -45,6 +43,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
             }
         }
 
+        // TODO (lorin): improve after type checking implementation
         for (Statement statement : function.getStatements()) {
             if (statement instanceof ReturnStatement returnStatement) {
                 if (function.getReturnType() instanceof VoidType && returnStatement.getExpression() != null) {
@@ -74,19 +73,79 @@ public class SemanticAnalyser extends BaseAstVisitor {
     }
 
     @Override
-    public void visit(CallExpression call) {
-        super.visit(call);
+    public void visit(ReturnStatement returnStatement) {
+        super.visit(returnStatement);
+    }
 
-        if (!symbolTable.hasFunction(call.getIdentifier())) {
-            errorListener.semanticError("function '" + call.getIdentifier() + "' not found");
+    @Override
+    public void visit(AssignmentStatement assignment) {
+        super.visit(assignment);
+        Type right = tyeStack.pop();
+        Type left = tyeStack.pop();
+        if (right.getClass() != InvalidType.class || left.getClass() != InvalidType.class) {
+            if (right.getClass() == left.getClass()) {
+                tyeStack.push(right);
+                return;
+            } else {
+                errorListener.semanticError("type mismatch '" + left + "' -> '" + right + "'");
+            }
+        }
+        tyeStack.push(new InvalidType());
+    }
+
+    @Override
+    public void visit(DeclarationStatement declarationStatement) {
+        super.visit(declarationStatement);
+    }
+
+    @Override
+    public void visit(CallStatement callStatement) {
+        super.visit(callStatement);
+    }
+
+    @Override
+    public void visit(IfStatement ifStatement) {
+        super.visit(ifStatement);
+    }
+
+    @Override
+    public void visit(WhileStatement whileStatement) {
+        super.visit(whileStatement);
+    }
+
+    @Override
+    public void visit(Block block) {
+        super.visit(block);
+    }
+
+    @Override
+    public void visit(UnaryExpression unaryExpression) {
+        super.visit(unaryExpression);
+    }
+
+    @Override
+    public void visit(BinaryExpression binaryExpression) {
+        super.visit(binaryExpression);
+    }
+
+    @Override
+    public void visit(CallExpression callExpression) {
+        super.visit(callExpression);
+
+        FunctionSymbol symbol = symbolTable.getFunction(callExpression.getIdentifier());
+        if (symbol == null) {
+            errorListener.semanticError("function '" + callExpression.getIdentifier() + "' not found");
+            tyeStack.push(new InvalidType());
             return;
         }
 
-        int paramCount = symbolTable.getFunction(call.getIdentifier()).paramTypes().size();
-        if (paramCount != call.getParameters().size()) {
-            errorListener.semanticError("function '" + call.getIdentifier() + "' expects " + paramCount
-                    + " parameters but " + call.getParameters().size() + " were given");
+        if (symbol.paramTypes().size() != callExpression.getParameters().size()) {
+            errorListener.semanticError("function '" + callExpression.getIdentifier() + "' expects "
+                    + symbol.paramTypes().size() + " parameters but "
+                    + callExpression.getParameters().size() + " were given");
         }
+
+        tyeStack.push(symbol.returnType());
     }
 
     @Override
@@ -96,33 +155,71 @@ public class SemanticAnalyser extends BaseAstVisitor {
         SymbolTable.Scope scope = symbolTable.getScope(variable);
         if (scope == null) {
             errorListener.semanticError("scope for '" + variable.getIdentifier() + "' not found");
+            tyeStack.push(new InvalidType());
             return;
         }
 
-        if (!scope.hasSymbol(variable.getIdentifier())) {
+        VariableSymbol symbol = scope.getSymbol(variable.getIdentifier());
+        if (symbol != null) {
+            tyeStack.push(symbol.type());
+        } else {
             errorListener.semanticError("variable '" + variable.getIdentifier() + "' not found");
+            tyeStack.push(new InvalidType());
         }
     }
 
     @Override
-    public void visit(FieldAccess field) {
-        super.visit(field);
+    public void visit(ArrayAccess arrayAccess) {
+        super.visit(arrayAccess);
+    }
 
-        SymbolTable.Scope scope = symbolTable.getScope(field);
+    @Override
+    public void visit(FieldAccess fieldAccess) {
+        super.visit(fieldAccess);
+
+        SymbolTable.Scope scope = symbolTable.getScope(fieldAccess);
         if (scope == null) {
-            errorListener.semanticError("scope for '" + field.getField() + "' not found");
+            errorListener.semanticError("scope for '" + fieldAccess.getField() + "' not found");
+            tyeStack.push(new InvalidType());
             return;
         }
 
-        VariableAccess variable = (VariableAccess) field.getBase();
+        VariableAccess variable = (VariableAccess) fieldAccess.getBase();
         VariableSymbol declaration = scope.getSymbol(variable.getIdentifier());
         if (declaration != null && declaration.type() instanceof RecordType type) {
             StructSymbol struct = symbolTable.getStruct(type.getIdentifier());
-            if (struct != null && !struct.fields().containsKey(field.getField())) {
-                errorListener.semanticError("field '" + field.getField() + "' not found");
+            if (struct != null && struct.fields().containsKey(fieldAccess.getField())) {
+                tyeStack.push(struct.fields().get(fieldAccess.getField()));
+                return;
             }
+            errorListener.semanticError("field '" + fieldAccess.getField() + "' not found");
         } else {
             errorListener.semanticError("variable '" + variable.getIdentifier() + "' is not a struct");
         }
+        tyeStack.push(new InvalidType());
+    }
+
+    @Override
+    public void visit(FalseConstant falseConstant) {
+        super.visit(falseConstant);
+        tyeStack.push(new BooleanType());
+    }
+
+    @Override
+    public void visit(IntegerConstant integerConstant) {
+        super.visit(integerConstant);
+        tyeStack.push(new IntegerType());
+    }
+
+    @Override
+    public void visit(StringConstant stringConstant) {
+        super.visit(stringConstant);
+        tyeStack.push(new StringType());
+    }
+
+    @Override
+    public void visit(TrueConstant trueConstant) {
+        super.visit(trueConstant);
+        tyeStack.push(new BooleanType());
     }
 }
