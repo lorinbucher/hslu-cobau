@@ -70,7 +70,7 @@ public class SymbolTableBuilder extends BaseAstVisitor {
 
     @Override
     public void visit(Declaration declaration) {
-        VariableSymbol symbol = new VariableSymbol(declaration.getIdentifier(), declaration.getType(), declaration);
+        VariableSymbol symbol = new VariableSymbol(declaration.getIdentifier(), declaration.getType());
         if (!currentScope.addSymbol(symbol)) {
             errorListener.semanticError("symbol '" + symbol.identifier() + "' already declared");
         }

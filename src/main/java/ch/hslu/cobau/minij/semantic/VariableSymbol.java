@@ -1,6 +1,5 @@
 package ch.hslu.cobau.minij.semantic;
 
-import ch.hslu.cobau.minij.ast.AstElement;
 import ch.hslu.cobau.minij.ast.type.Type;
 
 import java.util.Objects;
@@ -10,9 +9,8 @@ import java.util.Objects;
  *
  * @param identifier The identifier of the variable symbol.
  * @param type       The type of the variable symbol.
- * @param astElement The element of the AST.
  */
-public record VariableSymbol(String identifier, Type type, AstElement astElement) {
+public record VariableSymbol(String identifier, Type type) {
 
     /**
      * A variable symbol is equal if the identifier is the same.
