@@ -32,6 +32,9 @@ public class MiniJCompiler {
 
         // start parsing at outermost level (milestone 2)
         MiniJParser.UnitContext unitContext = miniJParser.unit();
+        if (errorListener.hasErrors()) {
+            System.exit(1);
+        }
 
         // semantic check (milestone 3)
         AstBuilder astBuilder = new AstBuilder();
