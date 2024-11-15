@@ -2,11 +2,15 @@ package ch.hslu.cobau.minij.semantic;
 
 import ch.hslu.cobau.minij.EnhancedConsoleErrorListener;
 import ch.hslu.cobau.minij.ast.BaseAstVisitor;
-import ch.hslu.cobau.minij.ast.constants.*;
-import ch.hslu.cobau.minij.ast.entity.*;
-import ch.hslu.cobau.minij.ast.expression.*;
-import ch.hslu.cobau.minij.ast.statement.*;
-import ch.hslu.cobau.minij.ast.type.*;
+import ch.hslu.cobau.minij.ast.entity.Declaration;
+import ch.hslu.cobau.minij.ast.entity.Function;
+import ch.hslu.cobau.minij.ast.entity.Struct;
+import ch.hslu.cobau.minij.ast.entity.Unit;
+import ch.hslu.cobau.minij.ast.expression.VariableAccess;
+import ch.hslu.cobau.minij.ast.type.IntegerType;
+import ch.hslu.cobau.minij.ast.type.RecordType;
+import ch.hslu.cobau.minij.ast.type.Type;
+import ch.hslu.cobau.minij.ast.type.VoidType;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +34,11 @@ public class SymbolTableBuilder extends BaseAstVisitor {
         this.errorListener = errorListener;
     }
 
+    /**
+     * Visits the entry point of the program and adds the built-in functions.
+     *
+     * @param program The program.
+     */
     @Override
     public void visit(Unit program) {
         currentScope = symbolTable.addScope(program, currentScope);
@@ -37,6 +46,11 @@ public class SymbolTableBuilder extends BaseAstVisitor {
         super.visit(program);
     }
 
+    /**
+     * Adds the function with its parameters and return type to the symbol table.
+     *
+     * @param function The function element in the AST.
+     */
     @Override
     public void visit(Function function) {
         currentScope = symbolTable.addScope(function, currentScope);
@@ -50,6 +64,11 @@ public class SymbolTableBuilder extends BaseAstVisitor {
         }
     }
 
+    /**
+     * Adds the struct with its type and fields to the symbol table.
+     *
+     * @param struct The struct element in the AST.
+     */
     @Override
     public void visit(Struct struct) {
         currentScope = symbolTable.addScope(struct, currentScope);
@@ -68,117 +87,29 @@ public class SymbolTableBuilder extends BaseAstVisitor {
         }
     }
 
+    /**
+     * Adds the variable with its type to the symbol table in the current scope.
+     *
+     * @param declaration The declaration element in the AST.
+     */
     @Override
     public void visit(Declaration declaration) {
+        super.visit(declaration);
         VariableSymbol symbol = new VariableSymbol(declaration.getIdentifier(), declaration.getType());
         if (!currentScope.addSymbol(symbol)) {
             errorListener.semanticError("symbol '" + symbol.identifier() + "' already declared");
         }
-        currentScope = symbolTable.addScope(declaration, currentScope);
-        super.visit(declaration);
-        currentScope = currentScope.getParent();
     }
 
-    @Override
-    public void visit(ReturnStatement returnStatement) {
-        symbolTable.addScope(returnStatement, currentScope);
-        super.visit(returnStatement);
-    }
-
-    @Override
-    public void visit(AssignmentStatement assignment) {
-        symbolTable.addScope(assignment, currentScope);
-        super.visit(assignment);
-    }
-
-    @Override
-    public void visit(DeclarationStatement declarationStatement) {
-        symbolTable.addScope(declarationStatement, currentScope);
-        super.visit(declarationStatement);
-    }
-
-    @Override
-    public void visit(CallStatement callStatement) {
-        symbolTable.addScope(callStatement, currentScope);
-        super.visit(callStatement);
-    }
-
-    @Override
-    public void visit(IfStatement ifStatement) {
-        symbolTable.addScope(ifStatement, currentScope);
-        super.visit(ifStatement);
-    }
-
-    @Override
-    public void visit(WhileStatement whileStatement) {
-        symbolTable.addScope(whileStatement, currentScope);
-        super.visit(whileStatement);
-    }
-
-    @Override
-    public void visit(Block block) {
-        symbolTable.addScope(block, currentScope);
-        super.visit(block);
-    }
-
-    @Override
-    public void visit(UnaryExpression unaryExpression) {
-        symbolTable.addScope(unaryExpression, currentScope);
-        super.visit(unaryExpression);
-    }
-
-    @Override
-    public void visit(BinaryExpression binaryExpression) {
-        symbolTable.addScope(binaryExpression, currentScope);
-        super.visit(binaryExpression);
-    }
-
-    @Override
-    public void visit(CallExpression callExpression) {
-        symbolTable.addScope(callExpression, currentScope);
-        super.visit(callExpression);
-    }
-
+    /**
+     * Adds a scope in the symbol table for the variable access element in the AST.
+     *
+     * @param variable The variable access element in the AST.
+     */
     @Override
     public void visit(VariableAccess variable) {
-        symbolTable.addScope(variable, currentScope);
         super.visit(variable);
-    }
-
-    @Override
-    public void visit(ArrayAccess arrayAccess) {
-        symbolTable.addScope(arrayAccess, currentScope);
-        super.visit(arrayAccess);
-    }
-
-    @Override
-    public void visit(FieldAccess fieldAccess) {
-        symbolTable.addScope(fieldAccess, currentScope);
-        super.visit(fieldAccess);
-    }
-
-    @Override
-    public void visit(FalseConstant falseConstant) {
-        symbolTable.addScope(falseConstant, currentScope);
-        super.visit(falseConstant);
-    }
-
-    @Override
-    public void visit(IntegerConstant integerConstant) {
-        symbolTable.addScope(integerConstant, currentScope);
-        super.visit(integerConstant);
-    }
-
-    @Override
-    public void visit(StringConstant stringConstant) {
-        symbolTable.addScope(stringConstant, currentScope);
-        super.visit(stringConstant);
-    }
-
-    @Override
-    public void visit(TrueConstant trueConstant) {
-        symbolTable.addScope(trueConstant, currentScope);
-        super.visit(trueConstant);
+        symbolTable.addScope(variable, currentScope);
     }
 
     /**

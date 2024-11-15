@@ -94,11 +94,6 @@ public class SemanticAnalyser extends BaseAstVisitor {
     }
 
     @Override
-    public void visit(DeclarationStatement declarationStatement) {
-        super.visit(declarationStatement);
-    }
-
-    @Override
     public void visit(CallStatement callStatement) {
         super.visit(callStatement);
         tyeStack.pop();
@@ -126,11 +121,6 @@ public class SemanticAnalyser extends BaseAstVisitor {
                 errorListener.semanticError(new BooleanType() + " type required but " + type + " provided");
             }
         }
-    }
-
-    @Override
-    public void visit(Block block) {
-        super.visit(block);
     }
 
     @Override

@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.Recognizer;
  * Extends the error listener of ANTLR to report semantic errors.
  */
 public class EnhancedConsoleErrorListener extends ConsoleErrorListener {
+
     private boolean hasErrors;
 
     @Override
@@ -16,11 +17,21 @@ public class EnhancedConsoleErrorListener extends ConsoleErrorListener {
         hasErrors = true;
     }
 
+    /**
+     * Prints a semantic error message to stderr.
+     *
+     * @param message The semantic error message.
+     */
     public void semanticError(String message) {
         System.err.println(message);
         hasErrors = true;
     }
 
+    /**
+     * Returns true if any error was reported.
+     *
+     * @return True if an error occurred, false if not.
+     */
     public boolean hasErrors() {
         return hasErrors;
     }
