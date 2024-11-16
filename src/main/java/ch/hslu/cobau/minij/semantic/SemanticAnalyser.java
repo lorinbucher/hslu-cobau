@@ -8,6 +8,7 @@ import ch.hslu.cobau.minij.ast.expression.*;
 import ch.hslu.cobau.minij.ast.statement.*;
 import ch.hslu.cobau.minij.ast.type.*;
 
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -67,7 +68,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
 
         if (declaration.getType() instanceof RecordType type) {
             if (!symbolTable.hasStruct(type.getIdentifier())) {
-                errorListener.semanticError("struct type '" + type.getIdentifier() + "' not found");
+                errorListener.semanticError("struct type '" + type.getIdentifier() + "' was not found");
             }
         }
     }
@@ -75,6 +76,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
     @Override
     public void visit(ReturnStatement returnStatement) {
         super.visit(returnStatement);
+
         if (returnStatement.getExpression() != null) {
             returnStack.push(typeStack.pop());
         } else {
@@ -85,11 +87,12 @@ public class SemanticAnalyser extends BaseAstVisitor {
     @Override
     public void visit(AssignmentStatement assignment) {
         super.visit(assignment);
+
         Type right = typeStack.pop();
         Type left = typeStack.pop();
         if (!(right instanceof InvalidType) && !(left instanceof InvalidType)) {
             if (!right.equals(left)) {
-                errorListener.semanticError("type mismatch '" + left + "' -> '" + right + "'");
+                errorListener.semanticError("type '" + right + "' cannot be assigned to type '" + left + "'");
             }
         }
     }
@@ -105,10 +108,8 @@ public class SemanticAnalyser extends BaseAstVisitor {
         super.visit(ifStatement);
 
         Type type = typeStack.pop();
-        if (!(type instanceof InvalidType)) {
-            if (!(type instanceof BooleanType)) {
-                errorListener.semanticError(new BooleanType() + " type required but " + type + " provided");
-            }
+        if (!(type instanceof InvalidType) && !(type instanceof BooleanType)) {
+            errorListener.semanticError("if statement expects 'boolean' type but '" + type + "' was provided");
         }
     }
 
@@ -117,10 +118,8 @@ public class SemanticAnalyser extends BaseAstVisitor {
         super.visit(whileStatement);
 
         Type type = typeStack.pop();
-        if (!(type instanceof InvalidType)) {
-            if (!(type instanceof BooleanType)) {
-                errorListener.semanticError(new BooleanType() + " type required but " + type + " provided");
-            }
+        if (!(type instanceof InvalidType) && !(type instanceof BooleanType)) {
+            errorListener.semanticError("while statement expects 'boolean' type but '" + type + "' was provided");
         }
     }
 
@@ -128,21 +127,16 @@ public class SemanticAnalyser extends BaseAstVisitor {
     public void visit(UnaryExpression unaryExpression) {
         super.visit(unaryExpression);
 
-        Type type = typeStack.pop();
-        if (!(type instanceof InvalidType)) {
-            if (unaryExpression.getUnaryOperator() == UnaryOperator.NOT) {
-                if (!(type instanceof BooleanType)) {
-                    errorListener.semanticError(UnaryOperator.NOT + " requires boolean type");
-                    type = new InvalidType();
-                }
-            } else {
-                if (!(type instanceof IntegerType)) {
-                    errorListener.semanticError(unaryExpression.getUnaryOperator() + " requires integer type");
-                    type = new InvalidType();
-                }
-            }
+        if (typeStack.peek() instanceof InvalidType) {
+            return;
         }
-        typeStack.push(type);
+
+        Type type = typeStack.pop();
+        if (unaryExpression.getUnaryOperator() == UnaryOperator.NOT) {
+            operatorTypeCheck(UnaryOperator.NOT.name(), type, type, List.of(BooleanType.class));
+        } else {
+            operatorTypeCheck(unaryExpression.getUnaryOperator().name(), type, type, List.of(IntegerType.class));
+        }
     }
 
     @Override
@@ -151,57 +145,34 @@ public class SemanticAnalyser extends BaseAstVisitor {
 
         Type right = typeStack.pop();
         Type left = typeStack.pop();
-        if (!(right instanceof InvalidType) && !(left instanceof InvalidType)) {
-            if (right.equals(left)) {
-                BinaryOperator binaryOp = binaryExpression.getBinaryOperator();
-                switch (binaryOp) {
-                    case PLUS:
-                        if (!(left instanceof IntegerType || left instanceof StringType)) {
-                            errorListener.semanticError(binaryOp + " requires integer or string type");
-                            typeStack.push(new InvalidType());
-                        } else {
-                            typeStack.push(left);
-                        }
-                        break;
-                    case MINUS, TIMES, DIV, MOD:
-                        if (!(left instanceof IntegerType)) {
-                            errorListener.semanticError(binaryOp + " requires integer type");
-                            typeStack.push(new InvalidType());
-                        } else {
-                            typeStack.push(left);
-                        }
-                        break;
-                    case EQUAL, UNEQUAL:
-                        if (!(left instanceof IntegerType || left instanceof StringType || left instanceof BooleanType)) {
-                            errorListener.semanticError(binaryOp + " requires integer, string or boolean type");
-                            typeStack.push(new InvalidType());
-                        } else {
-                            typeStack.push(new BooleanType());
-                        }
-                        break;
-                    case LESSER, LESSER_EQ, GREATER, GREATER_EQ:
-                        if (!(left instanceof IntegerType || left instanceof StringType)) {
-                            errorListener.semanticError(binaryOp + " requires integer or string type");
-                            typeStack.push(new InvalidType());
-                        } else {
-                            typeStack.push(new BooleanType());
-                        }
-                        break;
-                    case AND, OR:
-                        if (!(left instanceof BooleanType)) {
-                            errorListener.semanticError(binaryOp + " requires boolean type");
-                            typeStack.push(new InvalidType());
-                        } else {
-                            typeStack.push(left);
-                        }
-                        break;
-                }
-            } else {
-                errorListener.semanticError("type mismatch '" + left + "' -> '" + right + "'");
-                typeStack.push(new InvalidType());
+        if (right instanceof InvalidType || left instanceof InvalidType) {
+            typeStack.push(new InvalidType());
+            return;
+        }
+
+        if (right.equals(left)) {
+            BinaryOperator binaryOp = binaryExpression.getBinaryOperator();
+            switch (binaryOp) {
+                case PLUS:
+                    operatorTypeCheck(binaryOp.name(), left, left, List.of(IntegerType.class, StringType.class));
+                    break;
+                case MINUS, TIMES, DIV, MOD:
+                    operatorTypeCheck(binaryOp.name(), left, left, List.of(IntegerType.class));
+                    break;
+                case EQUAL, UNEQUAL:
+                    operatorTypeCheck(binaryOp.name(), left, new BooleanType(), List.of(
+                            IntegerType.class, StringType.class, BooleanType.class));
+                    break;
+                case LESSER, LESSER_EQ, GREATER, GREATER_EQ:
+                    operatorTypeCheck(binaryOp.name(), left, new BooleanType(), List.of(
+                            IntegerType.class, StringType.class));
+                    break;
+                case AND, OR:
+                    operatorTypeCheck(binaryOp.name(), left, left, List.of(BooleanType.class));
+                    break;
             }
         } else {
-            typeStack.push(new InvalidType());
+            typeError("cannot perform binary operation on types '" + left + "' and '" + right + "'");
         }
     }
 
@@ -211,8 +182,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
 
         FunctionSymbol symbol = symbolTable.getFunction(callExpression.getIdentifier());
         if (symbol == null) {
-            errorListener.semanticError("function '" + callExpression.getIdentifier() + "' not found");
-            typeStack.push(new InvalidType());
+            typeError("function '" + callExpression.getIdentifier() + "' was not found");
             return;
         }
 
@@ -226,7 +196,9 @@ public class SemanticAnalyser extends BaseAstVisitor {
             Type type = typeStack.pop();
             if (!(type instanceof InvalidType) && symbol.paramTypes().size() > i) {
                 if (!type.equals(symbol.paramTypes().get(i))) {
-                    errorListener.semanticError("function parameter type mismatch");
+                    errorListener.semanticError("function '" + callExpression.getIdentifier()
+                            + "' parameter expects type '" + symbol.paramTypes().get(i)
+                            + "' but '" + type + "' was provided");
                 }
             }
         }
@@ -240,8 +212,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
 
         SymbolTable.Scope scope = symbolTable.getScope(variable);
         if (scope == null) {
-            errorListener.semanticError("scope for '" + variable.getIdentifier() + "' not found");
-            typeStack.push(new InvalidType());
+            typeError("scope for '" + variable.getIdentifier() + "' was not found");
             return;
         }
 
@@ -249,8 +220,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
         if (symbol != null) {
             typeStack.push(symbol.type());
         } else {
-            errorListener.semanticError("variable '" + variable.getIdentifier() + "' not found");
-            typeStack.push(new InvalidType());
+            typeError("variable '" + variable.getIdentifier() + "' was not found");
         }
     }
 
@@ -266,16 +236,14 @@ public class SemanticAnalyser extends BaseAstVisitor {
         }
 
         if (!(accessType instanceof IntegerType)) {
-            errorListener.semanticError("array access requires integer type");
-            typeStack.push(new InvalidType());
+            typeError("array access expects integer type but '" + accessType + "' was provided");
             return;
         }
 
         if (variableType instanceof ArrayType type) {
             typeStack.push(type.getType());
         } else {
-            errorListener.semanticError("variable is not a an array type");
-            typeStack.push(new InvalidType());
+            typeError("array type expected but '" + variableType + "' was provided");
         }
     }
 
@@ -295,8 +263,7 @@ public class SemanticAnalyser extends BaseAstVisitor {
             }
         }
 
-        errorListener.semanticError("field '" + fieldAccess.getField() + "' not found");
-        typeStack.push(new InvalidType());
+        typeError("field '" + fieldAccess.getField() + "' was not found");
     }
 
     @Override
@@ -321,5 +288,31 @@ public class SemanticAnalyser extends BaseAstVisitor {
     public void visit(TrueConstant trueConstant) {
         super.visit(trueConstant);
         typeStack.push(new BooleanType());
+    }
+
+    /**
+     * Checks the type for an operator.
+     *
+     * @param operator     The operator name.
+     * @param type         The type of the expression.
+     * @param result       The result of the operation.
+     * @param allowedTypes The allowed types.
+     */
+    private void operatorTypeCheck(String operator, Type type, Type result, List<Class<?>> allowedTypes) {
+        if (allowedTypes.contains(type.getClass())) {
+            typeStack.push(result);
+        } else {
+            typeError("operator '" + operator + "' is not allowed for type '" + type + "'");
+        }
+    }
+
+    /**
+     * Reports a type error and suppresses later type errors by pushing an invalid type to the type stack.
+     *
+     * @param message The error message.
+     */
+    private void typeError(String message) {
+        errorListener.semanticError(message);
+        typeStack.push(new InvalidType());
     }
 }
