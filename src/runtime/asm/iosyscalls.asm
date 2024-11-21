@@ -1,4 +1,4 @@
-;; Copyright (c) 2020-2024 HSLU Informatik. All rights reserved.
+;; Copyright (c) 2020-2022 HSLU Informatik. All rights reserved.
 ;; This code and any derivative work thereof must remain private.
 ;; Public distribution is prohibited.
 
@@ -117,7 +117,8 @@ _write:     push    rcx                                     ; preserve clobbered
 
             ret
 
-_exit:      mov     rcx, rdi
+_exit:      sub     rsp, 8
+            mov     rcx, rdi
             call    ExitProcess
 %endif
 
