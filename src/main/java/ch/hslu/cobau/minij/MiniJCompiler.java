@@ -1,5 +1,6 @@
 package ch.hslu.cobau.minij;
 
+import ch.hslu.cobau.minij.asm.*;
 import ch.hslu.cobau.minij.ast.AstBuilder;
 import ch.hslu.cobau.minij.ast.entity.Unit;
 import ch.hslu.cobau.minij.semantic.SemanticAnalyser;
@@ -56,6 +57,15 @@ public class MiniJCompiler {
         program.accept(semanticAnalyser);
 
         // code generation (milestone 4)
+
+        //v1
+         //AsmGenerator asmGenerator = new AsmGenerator(errorListener, symbolTable);
+         //program.accept(asmGenerator);
+
+        //v2
+        GeneratedAsm generator = new GeneratedAsm(errorListener,symbolTable);
+        program.accept(generator);
+
 
         System.exit(errorListener.hasErrors() ? 1 : 0);
     }
