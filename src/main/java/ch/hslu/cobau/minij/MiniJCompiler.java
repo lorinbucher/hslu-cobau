@@ -58,13 +58,9 @@ public class MiniJCompiler {
 
         // code generation (milestone 4)
 
-        //v1
-         //AsmGenerator asmGenerator = new AsmGenerator(errorListener, symbolTable);
-         //program.accept(asmGenerator);
 
-        //v2
-        GeneratedAsm generator = new GeneratedAsm(errorListener,symbolTable);
-        program.accept(generator);
+        AsmGenerator asmGenerator = new AsmGenerator(errorListener, symbolTable);
+        program.accept(asmGenerator);
 
 
         System.exit(errorListener.hasErrors() ? 1 : 0);
