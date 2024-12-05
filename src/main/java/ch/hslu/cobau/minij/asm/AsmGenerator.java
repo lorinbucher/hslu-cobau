@@ -12,6 +12,7 @@ import ch.hslu.cobau.minij.ast.expression.*;
 import ch.hslu.cobau.minij.ast.statement.*;
 import ch.hslu.cobau.minij.ast.type.*;
 import ch.hslu.cobau.minij.semantic.*;
+import ch.hslu.cobau.minij.ast.*;
 
 
 import java.io.PrintStream;
@@ -77,7 +78,7 @@ public class AsmGenerator extends BaseAstVisitor {
         typeStack.pop();
         ps.println(";this is in the call Statement");
 
-        System.out.println("call " + callStatement);
+        ps.println("call " + callStatement);
     }
 
     @Override
@@ -87,7 +88,52 @@ public class AsmGenerator extends BaseAstVisitor {
         FunctionSymbol symbol = symbolTable.getFunction(callExpression.getIdentifier());
         String functionName = callExpression.getIdentifier();
         ps.println(";this is in the call Expression");
-        ps.println("call " + functionName);
+        ps.println(";calling " + functionName);
+
+        if (functionName.equals("writeInt") | functionName.equals("writeChar")){
+            callExpression.visitChildren(this);
+            List<Expression> param = callExpression.getParameters();
+            for (int i = 0; i < param.size(); i++){
+                Expression p = param.get(i);
+
+                //typeStack.pop();
+                ps.println(" mov rdi " + p);
+                ps.println("call " + functionName);
+            }
+
+        } else {
+            // for normal functions
+            List<Expression> param = callExpression.getParameters();
+            for (int i = 0; i < param.size(); i++){
+                Expression p = param.get(i);
+                ps.println(" push "+ p);
+            }
+            ps.println("call " + functionName);
+        }
+
         typeStack.push(symbol.returnType());
     }
+
+    @Override
+    public void visit(IntegerConstant integerConstant) {
+        super.visit(integerConstant);
+        //ps.println(" push " + integerConstant.getValue());
+        //typeStack.push(new IntegerType());
+    }
+
+    @Override
+    public void visit(VariableAccess variable) {
+        super.visit(variable);
+
+        SymbolTable.Scope scope = symbolTable.getScope(variable);
+
+
+        VariableSymbol symbol = scope.getSymbol(variable.getIdentifier());
+        typeStack.push(symbol.type());
+
+
+
+
+    }
+
 }
