@@ -16,7 +16,7 @@ public class ProgramGenerator extends BaseAstVisitor {
     // generated assembly code
     private String code;
 
-    // mapping from variable to positions on the stack
+    // mapping from variables to positions on the stack
     private final Map<String, Integer> localsMap = new HashMap<>();
 
     // temporary storage for generated assembly code fragments
@@ -56,29 +56,32 @@ public class ProgramGenerator extends BaseAstVisitor {
 
     @Override
     public void visit(Function function) {
-        if (function.getIdentifier().equals("main")) {
-            int stackSize = localsMap.size() * 8;
-            stackSize += stackSize % 16; // align to 16 bytes
+        int stackSize = localsMap.size() * 8;
+        stackSize += stackSize % 16; // align to 16 bytes
 
-            String code;
-            code = "_start:\n" +
-                    "    push rbp\n" +
-                    "    mov  rbp, rsp\n" +
-                    "    sub  rsp, " + stackSize + "\n";
-            codeFragments.push(code);
-
-            function.visitChildren(this);
-
-            code = """
+        String functionName = function.getIdentifier();
+        String epilogue;
+        if (functionName.equals("main")) {
+            functionName = "_start";
+            epilogue = """
                         mov  rdi, 0
                         call _exit
-                        mov  rsp, rbp
-                        pop  rbp
                     """;
-            codeFragments.push(code);
         } else {
-            codeFragments.push(function.getIdentifier() + ":\n");
-            function.visitChildren(this);
+            epilogue = """
+                        mov rsp, rbp
+                        pop rbp
+                        ret
+                    """;
         }
+
+        String prologue = functionName + ":\n" +
+                "    push rbp\n" +
+                "    mov  rbp, rsp\n" +
+                "    sub  rsp, " + stackSize + "\n";
+        codeFragments.push(prologue);
+
+        function.visitChildren(this);
+        codeFragments.push(epilogue);
     }
 }
