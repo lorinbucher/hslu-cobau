@@ -57,11 +57,8 @@ public class MiniJCompiler {
         program.accept(semanticAnalyser);
 
         // code generation (milestone 4)
-
-
         AsmGenerator asmGenerator = new AsmGenerator(errorListener, symbolTable);
         program.accept(asmGenerator);
-
 
         System.exit(errorListener.hasErrors() ? 1 : 0);
     }
