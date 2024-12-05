@@ -1,6 +1,7 @@
 package ch.hslu.cobau.minij;
 
-import ch.hslu.cobau.minij.asm.*;
+
+import ch.hslu.cobau.minij.asm.ProgramGenerator;
 import ch.hslu.cobau.minij.ast.AstBuilder;
 import ch.hslu.cobau.minij.ast.entity.Unit;
 import ch.hslu.cobau.minij.semantic.SemanticAnalyser;
@@ -57,9 +58,14 @@ public class MiniJCompiler {
         program.accept(semanticAnalyser);
 
         // code generation (milestone 4)
-        AsmGenerator asmGenerator = new AsmGenerator(errorListener, symbolTable);
-        program.accept(asmGenerator);
+        ProgramGenerator programGenerator = new ProgramGenerator();
+        program.accept(programGenerator);
 
-        System.exit(errorListener.hasErrors() ? 1 : 0);
+        // output only if there are no errors, otherwise exit with status "1"
+        if (!errorListener.hasErrors()) {
+            System.out.println(programGenerator.getCode());
+        } else {
+            System.exit(1);
+        }
     }
 }
