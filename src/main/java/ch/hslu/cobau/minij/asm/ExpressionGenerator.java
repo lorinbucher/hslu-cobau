@@ -27,19 +27,24 @@ public class ExpressionGenerator extends BaseAstVisitor {
 
     @Override
     public void visit(CallExpression callExpression) {
-        List<Expression> expressions = callExpression.getParameters();
+        List<Expression> parameters = callExpression.getParameters();
 
         // save first 6 parameters in register
-        for (int i = 0; i < expressions.size() && i < 6; i++) {
+        for (int i = 0; i < parameters.size() && i < 6; i++) {
             code.append("    mov ").append(PARAMETER_REGISTERS[i]).append(", ");
-            expressions.get(i).accept(this);
+            parameters.get(i).accept(this);
             code.append("\n");
         }
 
+        // add placeholder to stack if the number of parameters is odd
+        if (parameters.size() % 2 != 0) {
+            parameters.add(new IntegerConstant(0));
+        }
+
         // save additional parameters in stack in reverse order
-        for (int i = expressions.size() - 1; i >= 6; i--) {
+        for (int i = parameters.size() - 1; i >= 6; i--) {
             code.append("    mov rax, ");
-            expressions.get(i).accept(this);
+            parameters.get(i).accept(this);
             code.append("\n");
             code.append("    push rax\n");
         }
@@ -48,7 +53,7 @@ public class ExpressionGenerator extends BaseAstVisitor {
         code.append("    call ").append(callExpression.getIdentifier()).append("\n");
 
         // clean up parameters in stack
-        code.append("    pop rdi\n".repeat(Math.max(0, expressions.size() - 6)));
+        code.append("    pop rdi\n".repeat(Math.max(0, parameters.size() - 6)));
     }
 
     @Override
