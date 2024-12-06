@@ -4,8 +4,6 @@ import ch.hslu.cobau.minij.ast.BaseAstVisitor;
 import ch.hslu.cobau.minij.ast.entity.Function;
 import ch.hslu.cobau.minij.ast.entity.Unit;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -15,9 +13,6 @@ public class ProgramGenerator extends BaseAstVisitor {
 
     // generated assembly code
     private String code;
-
-    // mapping from variables to positions on the stack
-    private final Map<String, Integer> localsMap = new HashMap<>();
 
     // temporary storage for generated assembly code fragments
     private final Stack<String> codeFragments = new Stack<>();
@@ -56,19 +51,18 @@ public class ProgramGenerator extends BaseAstVisitor {
 
     @Override
     public void visit(Function function) {
-        int stackSize = localsMap.size() * 8;
-        stackSize += stackSize % 16; // align to 16 bytes
-
         String functionName = function.getIdentifier();
         String epilogue;
         if (functionName.equals("main")) {
             functionName = "_start";
             epilogue = """
+                        ; exit program
                         mov  rdi, 0
                         call _exit
                     """;
         } else {
             epilogue = """
+                        ; epilogue
                         mov rsp, rbp
                         pop rbp
                         ret
@@ -76,12 +70,16 @@ public class ProgramGenerator extends BaseAstVisitor {
         }
 
         String prologue = functionName + ":\n" +
+                "    ; prologue\n" +
                 "    push rbp\n" +
                 "    mov  rbp, rsp\n" +
-                "    sub  rsp, " + stackSize + "\n";
-        codeFragments.push(prologue);
+                "    sub  rsp, " + 0 + "\n";
 
-        function.visitChildren(this);
+        StatementGenerator statementGenerator = new StatementGenerator();
+        function.getStatements().forEach(statement -> statement.accept(statementGenerator));
+
+        codeFragments.push(prologue);
+        codeFragments.push(statementGenerator.getCode());
         codeFragments.push(epilogue);
     }
 }
