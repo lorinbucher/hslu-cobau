@@ -84,13 +84,16 @@ public class ExpressionGenerator extends BaseAstVisitor {
 
     @Override
     public void visit(BinaryExpression binaryExpression) {
-        // generate code for both operands
-        binaryExpression.getLeft().accept(this);
-        binaryExpression.getRight().accept(this);
+        BinaryOperator operator = binaryExpression.getBinaryOperator();
+        if (operator != BinaryOperator.AND && operator != BinaryOperator.OR) {
+            // generate code for both operands
+            binaryExpression.getLeft().accept(this);
+            binaryExpression.getRight().accept(this);
 
-        // load operands from stack
-        code.append("    pop rbx\n"); // right operand
-        code.append("    pop rax\n"); // left operand
+            // load operands from stack
+            code.append("    pop rbx\n"); // right operand
+            code.append("    pop rax\n"); // left operand
+        }
 
         String falseLabel = ".false_" + binaryExpression.hashCode();
         String trueLabel = ".true_" + binaryExpression.hashCode();
@@ -145,23 +148,39 @@ public class ExpressionGenerator extends BaseAstVisitor {
                 code.append("    movsx rax, dl\n");
                 break;
             case AND:
+                binaryExpression.getLeft().accept(this);
+                code.append("    pop rax\n");
+
                 code.append("    cmp rax, 0\n");
                 code.append("    je ").append(falseLabel).append("\n");
+
+                binaryExpression.getRight().accept(this);
+                code.append("    pop rbx\n");
+
                 code.append("    cmp rbx, 0\n");
                 code.append("    je ").append(falseLabel).append("\n");
                 code.append("    mov rax, 1\n");
                 code.append("    jmp ").append(endLabel).append("\n");
+
                 code.append(falseLabel).append(":\n");
                 code.append("    mov rax, 0\n");
                 code.append(endLabel).append(":\n");
                 break;
             case OR:
+                binaryExpression.getLeft().accept(this);
+                code.append("    pop rax\n");
+
                 code.append("    cmp rax, 0\n");
                 code.append("    jne ").append(trueLabel).append("\n");
+
+                binaryExpression.getRight().accept(this);
+                code.append("    pop rbx\n");
+
                 code.append("    cmp rbx, 0\n");
                 code.append("    jne ").append(trueLabel).append("\n");
                 code.append("    mov rax, 0\n");
                 code.append("    jmp ").append(endLabel).append("\n");
+
                 code.append(trueLabel).append(":\n");
                 code.append("    mov rax, 1\n");
                 code.append(endLabel).append(":\n");
