@@ -5,8 +5,6 @@ import ch.hslu.cobau.minij.ast.entity.Declaration;
 import ch.hslu.cobau.minij.ast.expression.VariableAccess;
 import ch.hslu.cobau.minij.ast.statement.AssignmentStatement;
 import ch.hslu.cobau.minij.ast.statement.CallStatement;
-import ch.hslu.cobau.minij.ast.statement.ReturnStatement;
-import ch.hslu.cobau.minij.ast.type.Type;
 
 import java.util.Map;
 
@@ -51,11 +49,11 @@ public class StatementGenerator extends BaseAstVisitor {
         if (localsMap.containsKey(variable.getIdentifier())) {
             code.append("    mov [rbp-");
             code.append(8 * localsMap.get(variable.getIdentifier()));
-            code.append("], rcx\n");
+            code.append("], rax\n");
         } else {
             code.append("    mov [");
             code.append(variable.getIdentifier());
-            code.append("], rcx\n");
+            code.append("], rax\n");
         }
     }
 

@@ -43,7 +43,7 @@ public class ExpressionGenerator extends BaseAstVisitor {
             parameters.get(i).accept(this);
             code.append("    mov ");
             code.append(PARAMETER_REGISTERS[i]);
-            code.append(", rcx\n");
+            code.append(", rax\n");
         }
 
         // add placeholder to stack if the number of parameters is odd
@@ -54,7 +54,6 @@ public class ExpressionGenerator extends BaseAstVisitor {
         // save additional parameters in stack in reverse order
         for (int i = parameters.size() - 1; i >= 6; i--) {
             parameters.get(i).accept(this);
-            code.append("    mov rax, rcx\n");
             code.append("    push rax\n");
         }
 
@@ -70,11 +69,11 @@ public class ExpressionGenerator extends BaseAstVisitor {
     @Override
     public void visit(VariableAccess variable) {
         if (localsMap.containsKey(variable.getIdentifier())) {
-            code.append("    mov rcx, [rbp-");
+            code.append("    mov rax, [rbp-");
             code.append(8 * localsMap.get(variable.getIdentifier()));
             code.append("]\n");
         } else {
-            code.append("    mov rcx, [");
+            code.append("    mov rax, [");
             code.append(variable.getIdentifier());
             code.append("]\n");
         }
@@ -83,13 +82,13 @@ public class ExpressionGenerator extends BaseAstVisitor {
     @Override
     public void visit(FalseConstant falseConstant) {
         falseConstant.visitChildren(this);
-        code.append("    mov rcx, 0\n");
+        code.append("    mov rax, 0\n");
     }
 
     @Override
     public void visit(IntegerConstant integerConstant) {
         integerConstant.visitChildren(this);
-        code.append("    mov rcx, ");
+        code.append("    mov rax, ");
         code.append(integerConstant.getValue());
         code.append("\n");
     }
@@ -97,6 +96,6 @@ public class ExpressionGenerator extends BaseAstVisitor {
     @Override
     public void visit(TrueConstant trueConstant) {
         trueConstant.visitChildren(this);
-        code.append("    mov rcx, 1\n");
+        code.append("    mov rax, 1\n");
     }
 }

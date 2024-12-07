@@ -15,6 +15,8 @@ import java.util.Stack;
  */
 public class ProgramGenerator extends BaseAstVisitor {
 
+    private final static String[] PARAMETER_REGISTERS = new String[]{"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+
     // generated assembly code
     private String code;
 
@@ -48,6 +50,7 @@ public class ProgramGenerator extends BaseAstVisitor {
                 """;
 
         code += "section .data\n";
+        code += "ALIGN 8\n";
         code += globalVariables.toString();
 
         code += "section .text\n";
@@ -81,7 +84,26 @@ public class ProgramGenerator extends BaseAstVisitor {
 
         Map<String, Integer> localsMap = new HashMap<>();
         StatementGenerator statementGenerator = new StatementGenerator(localsMap);
-        function.getFormalParameters().forEach(parameter -> parameter.accept(statementGenerator));
+
+        // save parameters as local variables
+        StringBuilder parameters = new StringBuilder();
+        for (int i = 0; i < function.getFormalParameters().size(); i++) {
+            Declaration declaration = function.getFormalParameters().get(i);
+            if (i < 6) {
+                // save parameters from registers
+                addLocal(localsMap, declaration.getIdentifier());
+                parameters.append("    mov [rbp-");
+                parameters.append(8 * localsMap.get(declaration.getIdentifier()));
+                parameters.append("], ");
+                parameters.append(PARAMETER_REGISTERS[i]);
+                parameters.append("\n");
+            } else {
+                // add variables already on the stack with positive offset
+                localsMap.put(declaration.getIdentifier(), -(i + 2 - 6));
+            }
+        }
+
+        // generate code for function body
         function.getStatements().forEach(statement -> statement.accept(statementGenerator));
 
         int stackSize = localsMap.size() * 8;
@@ -93,14 +115,26 @@ public class ProgramGenerator extends BaseAstVisitor {
                 "    sub  rsp, " + stackSize + "\n";
 
         codeFragments.push(prologue);
+        codeFragments.push(parameters.toString());
         codeFragments.push(statementGenerator.getCode());
         codeFragments.push(epilogue);
     }
 
     @Override
     public void visit(Declaration declaration) {
-        globalVariables.append("    ");
         globalVariables.append(declaration.getIdentifier());
-        globalVariables.append(": dq 0\n");
+        globalVariables.append(" dq 0\n");
+    }
+
+    /**
+     * Helper function to add a local variable to the stack.
+     *
+     * @param identifier Identifier of the variable.
+     */
+    private void addLocal(Map<String, Integer> localsMap, String identifier) {
+        int position = localsMap.size() + 1;
+        if (!localsMap.containsKey(identifier)) {
+            localsMap.put(identifier, position);
+        }
     }
 }
