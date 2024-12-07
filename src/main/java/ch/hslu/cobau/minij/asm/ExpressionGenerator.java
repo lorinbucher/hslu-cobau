@@ -33,6 +33,40 @@ public class ExpressionGenerator extends BaseAstVisitor {
     }
 
     @Override
+    public void visit(UnaryExpression unaryExpression) {
+        // generate code for the operand
+        unaryExpression.getExpression().accept(this);
+
+        // load operand from stack
+        code.append("    pop rax\n");
+
+        switch (unaryExpression.getUnaryOperator()) {
+            case MINUS:
+                code.append("    neg rax\n");
+                break;
+            case NOT:
+                code.append("    xor rax, 1\n");
+                break;
+            case PRE_INCREMENT:
+
+                break;
+            case PRE_DECREMENT:
+
+                break;
+            case POST_INCREMENT:
+
+                break;
+            case POST_DECREMENT:
+                break;
+            default:
+                break;
+        }
+
+        // push the result back onto stack
+        code.append("    push rax\n");
+    }
+
+    @Override
     public void visit(BinaryExpression binaryExpression) {
         // generate code for both operands
         binaryExpression.getLeft().accept(this);
@@ -42,6 +76,9 @@ public class ExpressionGenerator extends BaseAstVisitor {
         code.append("    pop rbx\n"); // right operand
         code.append("    pop rax\n"); // left operand
 
+        String falseLabel = ".false_" + binaryExpression.hashCode();
+        String trueLabel = ".true_" + binaryExpression.hashCode();
+        String endLabel = ".end_" + binaryExpression.hashCode();
         switch (binaryExpression.getBinaryOperator()) {
             case PLUS:
                 code.append("    add rax, rbx\n");
@@ -90,6 +127,28 @@ public class ExpressionGenerator extends BaseAstVisitor {
                 code.append("    cmp rax, rbx\n");
                 code.append("    setge dl\n");
                 code.append("    movsx rax, dl\n");
+                break;
+            case AND:
+                code.append("    cmp rax, 0\n");
+                code.append("    je ").append(falseLabel).append("\n");
+                code.append("    cmp rbx, 0\n");
+                code.append("    je ").append(falseLabel).append("\n");
+                code.append("    mov rax, 1\n");
+                code.append("    jmp ").append(endLabel).append("\n");
+                code.append(falseLabel).append(":\n");
+                code.append("    mov rax, 0\n");
+                code.append(endLabel).append(":\n");
+                break;
+            case OR:
+                code.append("    cmp rax, 0\n");
+                code.append("    jne ").append(trueLabel).append("\n");
+                code.append("    cmp rbx, 0\n");
+                code.append("    jne ").append(trueLabel).append("\n");
+                code.append("    mov rax, 0\n");
+                code.append("    jmp ").append(endLabel).append("\n");
+                code.append(trueLabel).append(":\n");
+                code.append("    mov rax, 1\n");
+                code.append(endLabel).append(":\n");
                 break;
             default:
                 break;

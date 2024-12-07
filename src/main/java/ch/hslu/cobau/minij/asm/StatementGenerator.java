@@ -90,8 +90,8 @@ public class StatementGenerator extends BaseAstVisitor {
     @Override
     public void visit(IfStatement ifStatement) {
         // generate unique labels for branching
-        String elseLabel = "else_" + System.identityHashCode(ifStatement);
-        String endLabel = "end_if_" + System.identityHashCode(ifStatement);
+        String elseLabel = "else_" + ifStatement.hashCode();
+        String endLabel = "end_if_" + ifStatement.hashCode();
 
         // evaluate the condition expression
         ExpressionGenerator expressionGenerator = new ExpressionGenerator(localsMap);
