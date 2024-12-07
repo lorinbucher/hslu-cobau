@@ -4,6 +4,8 @@ import ch.hslu.cobau.minij.ast.BaseAstVisitor;
 import ch.hslu.cobau.minij.ast.entity.Function;
 import ch.hslu.cobau.minij.ast.entity.Unit;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -69,14 +71,18 @@ public class ProgramGenerator extends BaseAstVisitor {
                     """;
         }
 
+        Map<String, Integer> localsMap = new HashMap<>();
+        StatementGenerator statementGenerator = new StatementGenerator(localsMap);
+        function.getFormalParameters().forEach(parameter -> parameter.accept(statementGenerator));
+        function.getStatements().forEach(statement -> statement.accept(statementGenerator));
+
+        int stackSize = localsMap.size() * 8;
+        stackSize += stackSize % 16; // align to 16 bytes
         String prologue = functionName + ":\n" +
                 "    ; prologue\n" +
                 "    push rbp\n" +
                 "    mov  rbp, rsp\n" +
-                "    sub  rsp, " + 0 + "\n";
-
-        StatementGenerator statementGenerator = new StatementGenerator();
-        function.getStatements().forEach(statement -> statement.accept(statementGenerator));
+                "    sub  rsp, " + stackSize + "\n";
 
         codeFragments.push(prologue);
         codeFragments.push(statementGenerator.getCode());

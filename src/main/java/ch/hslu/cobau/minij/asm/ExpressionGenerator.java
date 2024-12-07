@@ -6,8 +6,10 @@ import ch.hslu.cobau.minij.ast.constants.IntegerConstant;
 import ch.hslu.cobau.minij.ast.constants.TrueConstant;
 import ch.hslu.cobau.minij.ast.expression.CallExpression;
 import ch.hslu.cobau.minij.ast.expression.Expression;
+import ch.hslu.cobau.minij.ast.expression.VariableAccess;
 
 import java.util.List;
+import java.util.Map;
 
 public class ExpressionGenerator extends BaseAstVisitor {
 
@@ -15,6 +17,13 @@ public class ExpressionGenerator extends BaseAstVisitor {
 
     // generated assembly code
     private final StringBuilder code = new StringBuilder();
+
+    // mapping from variables to stack position
+    private final Map<String, Integer> localsMap;
+
+    public ExpressionGenerator(Map<String, Integer> localsMap) {
+        this.localsMap = localsMap;
+    }
 
     /**
      * Returns the generated assembly code.
@@ -31,9 +40,10 @@ public class ExpressionGenerator extends BaseAstVisitor {
 
         // save first 6 parameters in register
         for (int i = 0; i < parameters.size() && i < 6; i++) {
-            code.append("    mov ").append(PARAMETER_REGISTERS[i]).append(", ");
             parameters.get(i).accept(this);
-            code.append("\n");
+            code.append("    mov ");
+            code.append(PARAMETER_REGISTERS[i]);
+            code.append(", rcx\n");
         }
 
         // add placeholder to stack if the number of parameters is odd
@@ -43,34 +53,46 @@ public class ExpressionGenerator extends BaseAstVisitor {
 
         // save additional parameters in stack in reverse order
         for (int i = parameters.size() - 1; i >= 6; i--) {
-            code.append("    mov rax, ");
             parameters.get(i).accept(this);
-            code.append("\n");
+            code.append("    mov rax, rcx\n");
             code.append("    push rax\n");
         }
 
         // call function
-        code.append("    call ").append(callExpression.getIdentifier()).append("\n");
+        code.append("    call ");
+        code.append(callExpression.getIdentifier());
+        code.append("\n");
 
         // clean up parameters in stack
         code.append("    pop rdi\n".repeat(Math.max(0, parameters.size() - 6)));
     }
 
     @Override
+    public void visit(VariableAccess variable) {
+        if (localsMap.containsKey(variable.getIdentifier())) {
+            code.append("    mov rcx, [rbp-");
+            code.append(8 * localsMap.get(variable.getIdentifier()));
+            code.append("]\n");
+        }
+    }
+
+    @Override
     public void visit(FalseConstant falseConstant) {
         falseConstant.visitChildren(this);
-        code.append("0");
+        code.append("    mov rcx, 0\n");
     }
 
     @Override
     public void visit(IntegerConstant integerConstant) {
         integerConstant.visitChildren(this);
+        code.append("    mov rcx, ");
         code.append(integerConstant.getValue());
+        code.append("\n");
     }
 
     @Override
     public void visit(TrueConstant trueConstant) {
         trueConstant.visitChildren(this);
-        code.append("1");
+        code.append("    mov rcx, 1\n");
     }
 }
