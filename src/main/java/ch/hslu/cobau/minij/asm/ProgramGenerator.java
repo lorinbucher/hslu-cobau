@@ -36,8 +36,10 @@ public class ProgramGenerator extends BaseAstVisitor {
 
     @Override
     public void visit(Unit program) {
+        // visit all children
         program.visitChildren(this);
 
+        // program skeleton
         code.append("""
                 DEFAULT REL
                 extern readChar
@@ -48,10 +50,12 @@ public class ProgramGenerator extends BaseAstVisitor {
                 global _start
                 """);
 
+        // global variables
         code.append("section .data\n");
         code.append("ALIGN 8\n");
         code.append(globalVariables);
 
+        // program
         code.append("section .text\n");
         code.append(codeFragments);
     }
