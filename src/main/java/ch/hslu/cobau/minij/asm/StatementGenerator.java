@@ -50,6 +50,7 @@ public class StatementGenerator extends BaseAstVisitor {
             ExpressionGenerator expressionGenerator = new ExpressionGenerator(localsMap);
             returnStatement.getExpression().accept(expressionGenerator);
             code.append(expressionGenerator.getCode());
+            code.append("    pop rax\n");
         }
         if (!isMain) {
             code.append("    mov rsp, rbp\n");
@@ -64,6 +65,7 @@ public class StatementGenerator extends BaseAstVisitor {
         ExpressionGenerator expressionGenerator = new ExpressionGenerator(localsMap);
         assignment.getRight().accept(expressionGenerator);
         code.append(expressionGenerator.getCode());
+        code.append("    pop rax\n");
 
         // assign the value (right) to the variable (left)
         VariableAccess variable = (VariableAccess) assignment.getLeft();
@@ -96,7 +98,8 @@ public class StatementGenerator extends BaseAstVisitor {
         ifStatement.getExpression().accept(expressionGenerator);
         code.append(expressionGenerator.getCode());
 
-        // assuming the result of the expression is in register rax
+        // load the result from the stack
+        code.append("    pop rax\n");
         code.append("    cmp rax, 0\n");
         code.append("    je ").append(elseLabel).append("\n");
 
@@ -129,6 +132,7 @@ public class StatementGenerator extends BaseAstVisitor {
         whileStatement.getExpression().accept(expressionGenerator);
         code.append(expressionGenerator.getCode());
 
+        code.append("    pop rax\n");
         code.append("    cmp rax, 0\n");
         code.append("    je ").append(labelEnd).append("\n");
 

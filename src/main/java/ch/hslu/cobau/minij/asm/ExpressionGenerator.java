@@ -35,13 +35,12 @@ public class ExpressionGenerator extends BaseAstVisitor {
     @Override
     public void visit(BinaryExpression binaryExpression) {
         // generate code for both operands
-        binaryExpression.getRight().accept(this);
-        code.append("    mov rbx, rax\n");
         binaryExpression.getLeft().accept(this);
+        binaryExpression.getRight().accept(this);
 
-        // pop operands into registers and perform operation
-//        code.append("    pop rbx\n"); // Right operand
-//        code.append("    pop rax\n"); // Left operand
+        // load operands from stack
+        code.append("    pop rbx\n"); // right operand
+        code.append("    pop rax\n"); // left operand
 
         switch (binaryExpression.getBinaryOperator()) {
             case PLUS:
@@ -97,7 +96,7 @@ public class ExpressionGenerator extends BaseAstVisitor {
         }
 
         // push the result back onto stack
-//        code.append("    push    rax");
+        code.append("    push rax\n");
     }
 
     @Override
@@ -107,6 +106,7 @@ public class ExpressionGenerator extends BaseAstVisitor {
         // save first 6 parameters in register
         for (int i = 0; i < parameters.size() && i < 6; i++) {
             parameters.get(i).accept(this);
+            code.append("    pop rax\n");
             code.append("    mov ");
             code.append(PARAMETER_REGISTERS[i]);
             code.append(", rax\n");
@@ -120,7 +120,6 @@ public class ExpressionGenerator extends BaseAstVisitor {
         // save additional parameters in stack in reverse order
         for (int i = parameters.size() - 1; i >= 6; i--) {
             parameters.get(i).accept(this);
-            code.append("    push rax\n");
         }
 
         // call function
@@ -130,16 +129,19 @@ public class ExpressionGenerator extends BaseAstVisitor {
 
         // clean up parameters in stack
         code.append("    pop rdi\n".repeat(Math.max(0, parameters.size() - 6)));
+
+        // push return value to stack
+        code.append("    push rax\n");
     }
 
     @Override
     public void visit(VariableAccess variable) {
         if (localsMap.containsKey(variable.getIdentifier())) {
-            code.append("    mov rax, [rbp-");
+            code.append("    push qword [rbp-");
             code.append(8 * localsMap.get(variable.getIdentifier()));
             code.append("]\n");
         } else {
-            code.append("    mov rax, [");
+            code.append("    push qword [");
             code.append(variable.getIdentifier());
             code.append("]\n");
         }
@@ -148,7 +150,7 @@ public class ExpressionGenerator extends BaseAstVisitor {
     @Override
     public void visit(FalseConstant falseConstant) {
         falseConstant.visitChildren(this);
-        code.append("    mov rax, 0\n");
+        code.append("    push 0\n");
     }
 
     @Override
@@ -157,11 +159,12 @@ public class ExpressionGenerator extends BaseAstVisitor {
         code.append("    mov rax, ");
         code.append(integerConstant.getValue());
         code.append("\n");
+        code.append("    push rax\n");
     }
 
     @Override
     public void visit(TrueConstant trueConstant) {
         trueConstant.visitChildren(this);
-        code.append("    mov rax, 1\n");
+        code.append("    push 1\n");
     }
 }
