@@ -52,6 +52,10 @@ public class StatementGenerator extends BaseAstVisitor {
             code.append("    mov [rbp-");
             code.append(8 * localsMap.get(variable.getIdentifier()));
             code.append("], rcx\n");
+        } else {
+            code.append("    mov [");
+            code.append(variable.getIdentifier());
+            code.append("], rcx\n");
         }
     }
 

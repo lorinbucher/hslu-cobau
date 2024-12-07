@@ -73,6 +73,10 @@ public class ExpressionGenerator extends BaseAstVisitor {
             code.append("    mov rcx, [rbp-");
             code.append(8 * localsMap.get(variable.getIdentifier()));
             code.append("]\n");
+        } else {
+            code.append("    mov rcx, [");
+            code.append(variable.getIdentifier());
+            code.append("]\n");
         }
     }
 

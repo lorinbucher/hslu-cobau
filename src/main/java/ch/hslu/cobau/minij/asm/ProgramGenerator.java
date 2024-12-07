@@ -1,12 +1,14 @@
 package ch.hslu.cobau.minij.asm;
 
 import ch.hslu.cobau.minij.ast.BaseAstVisitor;
+import ch.hslu.cobau.minij.ast.entity.Declaration;
 import ch.hslu.cobau.minij.ast.entity.Function;
 import ch.hslu.cobau.minij.ast.entity.Unit;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+
 
 /**
  * Implements the Assembly code generation for the MiniJ language.
@@ -18,6 +20,9 @@ public class ProgramGenerator extends BaseAstVisitor {
 
     // temporary storage for generated assembly code fragments
     private final Stack<String> codeFragments = new Stack<>();
+
+    // temporary storage for generated assembly code of global variables
+    private final StringBuilder globalVariables = new StringBuilder();
 
     /**
      * Returns the generated assembly code.
@@ -40,9 +45,12 @@ public class ProgramGenerator extends BaseAstVisitor {
                 extern writeInt
                 extern _exit
                 global _start
-                section .text
                 """;
 
+        code += "section .data\n";
+        code += globalVariables.toString();
+
+        code += "section .text\n";
         StringBuilder fragments = new StringBuilder();
         while (!codeFragments.isEmpty()) {
             fragments.insert(0, codeFragments.pop());
@@ -87,5 +95,12 @@ public class ProgramGenerator extends BaseAstVisitor {
         codeFragments.push(prologue);
         codeFragments.push(statementGenerator.getCode());
         codeFragments.push(epilogue);
+    }
+
+    @Override
+    public void visit(Declaration declaration) {
+        globalVariables.append("    ");
+        globalVariables.append(declaration.getIdentifier());
+        globalVariables.append(": dq 0\n");
     }
 }
