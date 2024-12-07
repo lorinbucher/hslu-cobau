@@ -7,7 +7,6 @@ import ch.hslu.cobau.minij.ast.entity.Unit;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 
 
 /**
@@ -18,10 +17,10 @@ public class ProgramGenerator extends BaseAstVisitor {
     private final static String[] PARAMETER_REGISTERS = new String[]{"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
     // generated assembly code
-    private String code;
+    private final StringBuilder code = new StringBuilder();
 
     // temporary storage for generated assembly code fragments
-    private final Stack<String> codeFragments = new Stack<>();
+    private final StringBuilder codeFragments = new StringBuilder();
 
     // temporary storage for generated assembly code of global variables
     private final StringBuilder globalVariables = new StringBuilder();
@@ -32,14 +31,14 @@ public class ProgramGenerator extends BaseAstVisitor {
      * @return Generated assembly code.
      */
     public String getCode() {
-        return code;
+        return code.toString();
     }
 
     @Override
     public void visit(Unit program) {
         program.visitChildren(this);
 
-        code = """
+        code.append("""
                 DEFAULT REL
                 extern readChar
                 extern readInt
@@ -47,19 +46,14 @@ public class ProgramGenerator extends BaseAstVisitor {
                 extern writeInt
                 extern _exit
                 global _start
-                """;
+                """);
 
-        code += "section .data\n";
-        code += "ALIGN 8\n";
-        code += globalVariables.toString();
+        code.append("section .data\n");
+        code.append("ALIGN 8\n");
+        code.append(globalVariables);
 
-        code += "section .text\n";
-        StringBuilder fragments = new StringBuilder();
-        while (!codeFragments.isEmpty()) {
-            fragments.insert(0, codeFragments.pop());
-        }
-
-        code += fragments;
+        code.append("section .text\n");
+        code.append(codeFragments);
     }
 
     @Override
@@ -116,10 +110,10 @@ public class ProgramGenerator extends BaseAstVisitor {
                 "    mov  rbp, rsp\n" +
                 "    sub  rsp, " + stackSize + "\n";
 
-        codeFragments.push(prologue);
-        codeFragments.push(parameters.toString());
-        codeFragments.push(statementGenerator.getCode());
-        codeFragments.push(epilogue);
+        codeFragments.append(prologue);
+        codeFragments.append(parameters);
+        codeFragments.append(statementGenerator.getCode());
+        codeFragments.append(epilogue);
     }
 
     @Override
