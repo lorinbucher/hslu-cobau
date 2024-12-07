@@ -4,9 +4,7 @@ import ch.hslu.cobau.minij.ast.BaseAstVisitor;
 import ch.hslu.cobau.minij.ast.constants.FalseConstant;
 import ch.hslu.cobau.minij.ast.constants.IntegerConstant;
 import ch.hslu.cobau.minij.ast.constants.TrueConstant;
-import ch.hslu.cobau.minij.ast.expression.CallExpression;
-import ch.hslu.cobau.minij.ast.expression.Expression;
-import ch.hslu.cobau.minij.ast.expression.VariableAccess;
+import ch.hslu.cobau.minij.ast.expression.*;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +30,74 @@ public class ExpressionGenerator extends BaseAstVisitor {
      */
     public String getCode() {
         return code.toString();
+    }
+
+    @Override
+    public void visit(BinaryExpression binaryExpression) {
+        // generate code for both operands
+        binaryExpression.getRight().accept(this);
+        code.append("    mov rbx, rax\n");
+        binaryExpression.getLeft().accept(this);
+
+        // pop operands into registers and perform operation
+//        code.append("    pop rbx\n"); // Right operand
+//        code.append("    pop rax\n"); // Left operand
+
+        switch (binaryExpression.getBinaryOperator()) {
+            case PLUS:
+                code.append("    add rax, rbx\n");
+                break;
+            case MINUS:
+                code.append("    sub rax, rbx\n");
+                break;
+            case TIMES:
+                code.append("    imul rax, rbx\n");
+                break;
+            case DIV:
+                code.append("    xor rdx, rdx\n");
+                code.append("    idiv rbx\n");
+                break;
+            case MOD:
+                code.append("    xor rdx, rdx\n");
+                code.append("    idiv rbx\n");
+                code.append("    mov rax, rdx\n");
+                break;
+            case EQUAL:
+                code.append("    cmp rax, rbx\n");
+                code.append("    sete dl\n");
+                code.append("    movsx rax, dl\n");
+                break;
+            case UNEQUAL:
+                code.append("    cmp rax, rbx\n");
+                code.append("    setne dl\n");
+                code.append("    movsx rax, dl\n");
+                break;
+            case LESSER:
+                code.append("    cmp rax, rbx\n");
+                code.append("    setl dl\n");
+                code.append("    movsx rax, dl\n");
+                break;
+            case LESSER_EQ:
+                code.append("    cmp rax, rbx\n");
+                code.append("    setle dl\n");
+                code.append("    movsx rax, dl\n");
+                break;
+            case GREATER:
+                code.append("    cmp rax, rbx\n");
+                code.append("    setg dl\n");
+                code.append("    movsx rax, dl\n");
+                break;
+            case GREATER_EQ:
+                code.append("    cmp rax, rbx\n");
+                code.append("    setge dl\n");
+                code.append("    movsx rax, dl\n");
+                break;
+            default:
+                break;
+        }
+
+        // push the result back onto stack
+//        code.append("    push    rax");
     }
 
     @Override
