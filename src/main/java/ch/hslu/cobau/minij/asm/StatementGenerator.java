@@ -3,9 +3,7 @@ package ch.hslu.cobau.minij.asm;
 import ch.hslu.cobau.minij.ast.BaseAstVisitor;
 import ch.hslu.cobau.minij.ast.entity.Declaration;
 import ch.hslu.cobau.minij.ast.expression.VariableAccess;
-import ch.hslu.cobau.minij.ast.statement.AssignmentStatement;
-import ch.hslu.cobau.minij.ast.statement.CallStatement;
-import ch.hslu.cobau.minij.ast.statement.ReturnStatement;
+import ch.hslu.cobau.minij.ast.statement.*;
 
 import java.util.Map;
 
@@ -85,5 +83,36 @@ public class StatementGenerator extends BaseAstVisitor {
         ExpressionGenerator expressionGenerator = new ExpressionGenerator(localsMap);
         callStatement.getCallExpression().accept(expressionGenerator);
         code.append(expressionGenerator.getCode());
+    }
+
+    @Override
+    public void visit(IfStatement ifStatement) {
+        // generate unique labels for branching
+        String elseLabel = "else_" + System.identityHashCode(ifStatement);
+        String endLabel = "end_if_" + System.identityHashCode(ifStatement);
+
+        // evaluate the condition expression
+        ExpressionGenerator expressionGenerator = new ExpressionGenerator(localsMap);
+        ifStatement.getExpression().accept(expressionGenerator);
+        code.append(expressionGenerator.getCode());
+
+        // assuming the result of the expression is in register rax
+        code.append("    cmp rax, 0\n");
+        code.append("    je ").append(elseLabel).append("\n");
+
+        // generate code for the "if" block
+        for (Statement statement : ifStatement.getStatements()) {
+            statement.accept(this);
+        }
+        code.append("    jmp ").append(endLabel).append("\n");
+
+        // generate code for the "else" block (if present)
+        code.append(elseLabel).append(":\n");
+        if (ifStatement.getElseBlock() != null) {
+            ifStatement.getElseBlock().accept(this);
+        }
+
+        // End label for the if-else construct
+        code.append(endLabel).append(":\n");
     }
 }
