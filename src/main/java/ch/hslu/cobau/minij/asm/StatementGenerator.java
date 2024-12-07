@@ -106,13 +106,41 @@ public class StatementGenerator extends BaseAstVisitor {
         }
         code.append("    jmp ").append(endLabel).append("\n");
 
-        // generate code for the "else" block (if present)
+        // generate code for the "else" block
         code.append(elseLabel).append(":\n");
         if (ifStatement.getElseBlock() != null) {
             ifStatement.getElseBlock().accept(this);
         }
 
-        // End label for the if-else construct
+        // end label for the "if-else" statement
         code.append(endLabel).append(":\n");
+    }
+
+    @Override
+    public void visit(WhileStatement whileStatement) {
+        String labelStart = "loop_" + System.identityHashCode(whileStatement);
+        String labelEnd = "end_loop_" + System.identityHashCode(whileStatement);
+
+        // start of loop
+        code.append(labelStart).append(":").append("\n");
+
+        // evaluate the condition expression
+        ExpressionGenerator expressionGenerator = new ExpressionGenerator(localsMap);
+        whileStatement.getExpression().accept(expressionGenerator);
+        code.append(expressionGenerator.getCode());
+
+        code.append("    cmp rax, 0\n");
+        code.append("    je ").append(labelEnd).append("\n");
+
+        // generate code for the "while" body
+        for (Statement statement : whileStatement.getStatements()) {
+            statement.accept(this);
+        }
+
+        // jump back to start
+        code.append("    jmp ").append(labelStart).append("\n");
+
+        // end of loop
+        code.append(labelEnd).append(":").append("\n");
     }
 }
