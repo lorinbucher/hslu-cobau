@@ -64,26 +64,28 @@ public class ProgramGenerator extends BaseAstVisitor {
 
     @Override
     public void visit(Function function) {
+        Map<String, Integer> localsMap = new HashMap<>();
+        StatementGenerator statementGenerator;
         String functionName = function.getIdentifier();
         String epilogue;
         if (functionName.equals("main")) {
+            statementGenerator = new StatementGenerator(localsMap, true);
             functionName = "_start";
             epilogue = """
                         ; exit program
-                        mov  rdi, 0
+                        mov  rdi, rax
                         call _exit
                     """;
         } else {
+            statementGenerator = new StatementGenerator(localsMap);
             epilogue = """
                         ; epilogue
+                        mov rax, 0
                         mov rsp, rbp
                         pop rbp
                         ret
                     """;
         }
-
-        Map<String, Integer> localsMap = new HashMap<>();
-        StatementGenerator statementGenerator = new StatementGenerator(localsMap);
 
         // save parameters as local variables
         StringBuilder parameters = new StringBuilder();
@@ -91,7 +93,7 @@ public class ProgramGenerator extends BaseAstVisitor {
             Declaration declaration = function.getFormalParameters().get(i);
             if (i < 6) {
                 // save parameters from registers
-                addLocal(localsMap, declaration.getIdentifier());
+                localsMap.put(declaration.getIdentifier(), localsMap.size() + 1);
                 parameters.append("    mov [rbp-");
                 parameters.append(8 * localsMap.get(declaration.getIdentifier()));
                 parameters.append("], ");
@@ -124,17 +126,5 @@ public class ProgramGenerator extends BaseAstVisitor {
     public void visit(Declaration declaration) {
         globalVariables.append(declaration.getIdentifier());
         globalVariables.append(" dq 0\n");
-    }
-
-    /**
-     * Helper function to add a local variable to the stack.
-     *
-     * @param identifier Identifier of the variable.
-     */
-    private void addLocal(Map<String, Integer> localsMap, String identifier) {
-        int position = localsMap.size() + 1;
-        if (!localsMap.containsKey(identifier)) {
-            localsMap.put(identifier, position);
-        }
     }
 }

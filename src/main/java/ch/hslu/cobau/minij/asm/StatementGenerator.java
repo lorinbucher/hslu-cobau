@@ -5,6 +5,7 @@ import ch.hslu.cobau.minij.ast.entity.Declaration;
 import ch.hslu.cobau.minij.ast.expression.VariableAccess;
 import ch.hslu.cobau.minij.ast.statement.AssignmentStatement;
 import ch.hslu.cobau.minij.ast.statement.CallStatement;
+import ch.hslu.cobau.minij.ast.statement.ReturnStatement;
 
 import java.util.Map;
 
@@ -13,11 +14,19 @@ public class StatementGenerator extends BaseAstVisitor {
     // generated assembly code
     private final StringBuilder code = new StringBuilder();
 
+    private final boolean isMain;
+
     // mapping from variables to stack position
     private final Map<String, Integer> localsMap;
 
     public StatementGenerator(Map<String, Integer> localsMap) {
         this.localsMap = localsMap;
+        this.isMain = false;
+    }
+
+    public StatementGenerator(Map<String, Integer> localsMap, boolean isMain) {
+        this.localsMap = localsMap;
+        this.isMain = isMain;
     }
 
     /**
@@ -31,10 +40,24 @@ public class StatementGenerator extends BaseAstVisitor {
 
     @Override
     public void visit(Declaration declaration) {
-        addLocal(declaration.getIdentifier());
+        localsMap.put(declaration.getIdentifier(), localsMap.size() + 1);
         code.append("    mov qword [rbp-");
         code.append(8 * localsMap.get(declaration.getIdentifier()));
         code.append("], 0\n");
+    }
+
+    @Override
+    public void visit(ReturnStatement returnStatement) {
+        if (returnStatement.getExpression() != null) {
+            ExpressionGenerator expressionGenerator = new ExpressionGenerator(localsMap);
+            returnStatement.getExpression().accept(expressionGenerator);
+            code.append(expressionGenerator.getCode());
+        }
+        if (!isMain) {
+            code.append("    mov rsp, rbp\n");
+            code.append("    pop rbp\n");
+            code.append("    ret\n");
+        }
     }
 
     @Override
@@ -62,17 +85,5 @@ public class StatementGenerator extends BaseAstVisitor {
         ExpressionGenerator expressionGenerator = new ExpressionGenerator(localsMap);
         callStatement.getCallExpression().accept(expressionGenerator);
         code.append(expressionGenerator.getCode());
-    }
-
-    /**
-     * Helper function to add a local variable to the stack.
-     *
-     * @param identifier Identifier of the variable.
-     */
-    private void addLocal(String identifier) {
-        int position = localsMap.size() + 1;
-        if (!localsMap.containsKey(identifier)) {
-            localsMap.put(identifier, position);
-        }
     }
 }
