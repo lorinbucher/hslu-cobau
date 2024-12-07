@@ -9,6 +9,9 @@ import ch.hslu.cobau.minij.ast.expression.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Implements the Assembly code generation for the expressions of the MiniJ language.
+ */
 public class ExpressionGenerator extends BaseAstVisitor {
 
     private final static String[] PARAMETER_REGISTERS = new String[]{"rdi", "rsi", "rdx", "rcx", "r8", "r9"};

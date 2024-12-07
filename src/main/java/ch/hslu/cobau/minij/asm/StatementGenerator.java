@@ -2,11 +2,13 @@ package ch.hslu.cobau.minij.asm;
 
 import ch.hslu.cobau.minij.ast.BaseAstVisitor;
 import ch.hslu.cobau.minij.ast.entity.Declaration;
-import ch.hslu.cobau.minij.ast.expression.VariableAccess;
 import ch.hslu.cobau.minij.ast.statement.*;
 
 import java.util.Map;
 
+/**
+ * Implements the Assembly code generation for the statements of the MiniJ language.
+ */
 public class StatementGenerator extends BaseAstVisitor {
 
     // generated assembly code
@@ -65,20 +67,17 @@ public class StatementGenerator extends BaseAstVisitor {
         ExpressionGenerator expressionGenerator = new ExpressionGenerator(localsMap);
         assignment.getRight().accept(expressionGenerator);
         code.append(expressionGenerator.getCode());
-        code.append("    pop rax\n");
+
+        // get the address (left) of the assignment
+        ExpressionMemoryGenerator expressionMemoryGenerator = new ExpressionMemoryGenerator(localsMap);
+        assignment.getLeft().accept(expressionMemoryGenerator);
+        code.append(expressionMemoryGenerator.getCode());
+
+        code.append("    pop rbx\n"); // variable address (left)
+        code.append("    pop rax\n"); // expression value (right)
 
         // assign the value (right) to the variable (left)
-        if (assignment.getLeft() instanceof VariableAccess variable) {
-            if (localsMap.containsKey(variable.getIdentifier())) {
-                code.append("    mov [rbp-");
-                code.append(8 * localsMap.get(variable.getIdentifier()));
-                code.append("], rax\n");
-            } else {
-                code.append("    mov [");
-                code.append(variable.getIdentifier());
-                code.append("], rax\n");
-            }
-        }
+        code.append("    mov [rbx], rax\n");
     }
 
     @Override

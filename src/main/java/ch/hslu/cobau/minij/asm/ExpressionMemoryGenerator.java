@@ -9,6 +9,9 @@ import ch.hslu.cobau.minij.ast.expression.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Implements the Assembly code generation for the memory expressions of the MiniJ language.
+ */
 public class ExpressionMemoryGenerator extends BaseAstVisitor {
 
     // generated assembly code
