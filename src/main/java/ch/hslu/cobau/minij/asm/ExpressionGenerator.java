@@ -35,7 +35,16 @@ public class ExpressionGenerator extends BaseAstVisitor {
     @Override
     public void visit(UnaryExpression unaryExpression) {
         // generate code for the operand
-        unaryExpression.getExpression().accept(this);
+        switch (unaryExpression.getUnaryOperator()) {
+            case MINUS, NOT:
+                unaryExpression.getExpression().accept(this);
+                break;
+            default:
+                ExpressionMemoryGenerator expressionMemoryGenerator = new ExpressionMemoryGenerator(localsMap);
+                unaryExpression.getExpression().accept(expressionMemoryGenerator);
+                code.append(expressionMemoryGenerator.getCode());
+                break;
+        }
 
         // load operand from stack
         code.append("    pop rax\n");
@@ -48,15 +57,22 @@ public class ExpressionGenerator extends BaseAstVisitor {
                 code.append("    xor rax, 1\n");
                 break;
             case PRE_INCREMENT:
-
+                code.append("    inc qword [rax]\n");
+                code.append("    mov rax, [rax]\n");
                 break;
             case PRE_DECREMENT:
-
+                code.append("    dec qword [rax]\n");
+                code.append("    mov rax, [rax]\n");
                 break;
             case POST_INCREMENT:
-
+                code.append("    mov rbx, [rax]\n");
+                code.append("    inc qword [rax]\n");
+                code.append("    mov rax, rbx\n");
                 break;
             case POST_DECREMENT:
+                code.append("    mov rbx, [rax]\n");
+                code.append("    dec qword [rax]\n");
+                code.append("    mov rax, rbx\n");
                 break;
             default:
                 break;

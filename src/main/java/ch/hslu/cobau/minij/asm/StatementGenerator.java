@@ -68,15 +68,16 @@ public class StatementGenerator extends BaseAstVisitor {
         code.append("    pop rax\n");
 
         // assign the value (right) to the variable (left)
-        VariableAccess variable = (VariableAccess) assignment.getLeft();
-        if (localsMap.containsKey(variable.getIdentifier())) {
-            code.append("    mov [rbp-");
-            code.append(8 * localsMap.get(variable.getIdentifier()));
-            code.append("], rax\n");
-        } else {
-            code.append("    mov [");
-            code.append(variable.getIdentifier());
-            code.append("], rax\n");
+        if (assignment.getLeft() instanceof VariableAccess variable) {
+            if (localsMap.containsKey(variable.getIdentifier())) {
+                code.append("    mov [rbp-");
+                code.append(8 * localsMap.get(variable.getIdentifier()));
+                code.append("], rax\n");
+            } else {
+                code.append("    mov [");
+                code.append(variable.getIdentifier());
+                code.append("], rax\n");
+            }
         }
     }
 
