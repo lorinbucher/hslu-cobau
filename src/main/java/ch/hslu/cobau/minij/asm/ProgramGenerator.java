@@ -77,7 +77,6 @@ public class ProgramGenerator extends BaseAstVisitor {
         } else {
             statementGenerator = new StatementGenerator(localsMap);
             epilogue = """
-                        ; epilogue
                         mov rax, 0
                         mov rsp, rbp
                         pop rbp
@@ -108,11 +107,13 @@ public class ProgramGenerator extends BaseAstVisitor {
 
         int stackSize = localsMap.size() * 8;
         stackSize += stackSize % 16; // align to 16 bytes
-        String prologue = functionName + ":\n" +
-                "    ; prologue\n" +
+        String prologue = functionName +
+                ":\n" +
                 "    push rbp\n" +
                 "    mov  rbp, rsp\n" +
-                "    sub  rsp, " + stackSize + "\n";
+                "    sub  rsp, " +
+                stackSize +
+                "\n";
 
         codeFragments.append(prologue);
         codeFragments.append(parameters);

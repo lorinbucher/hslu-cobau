@@ -43,6 +43,7 @@ public class ExpressionGenerator extends BaseAstVisitor {
                 unaryExpression.getExpression().accept(this);
                 break;
             default:
+                // load variable address for memory operations
                 ExpressionMemoryGenerator expressionMemoryGenerator = new ExpressionMemoryGenerator(localsMap);
                 unaryExpression.getExpression().accept(expressionMemoryGenerator);
                 code.append(expressionMemoryGenerator.getCode());
@@ -151,41 +152,59 @@ public class ExpressionGenerator extends BaseAstVisitor {
                 code.append("    movsx rax, dl\n");
                 break;
             case AND:
+                // process the left operand first
                 binaryExpression.getLeft().accept(this);
                 code.append("    pop rax\n");
 
+                // check if the left operand is false
                 code.append("    cmp rax, 0\n");
                 code.append("    je ").append(falseLabel).append("\n");
 
+                // process the right operand if left operand is true
                 binaryExpression.getRight().accept(this);
                 code.append("    pop rbx\n");
 
+                // check if the right operand is false
                 code.append("    cmp rbx, 0\n");
                 code.append("    je ").append(falseLabel).append("\n");
+
+                // return true if both operands are true
                 code.append("    mov rax, 1\n");
                 code.append("    jmp ").append(endLabel).append("\n");
 
+                // return false if one of the operands is false
                 code.append(falseLabel).append(":\n");
                 code.append("    mov rax, 0\n");
+
+                // end operation
                 code.append(endLabel).append(":\n");
                 break;
             case OR:
+                // process the left operand first
                 binaryExpression.getLeft().accept(this);
                 code.append("    pop rax\n");
 
+                // check if the left operand is true
                 code.append("    cmp rax, 0\n");
                 code.append("    jne ").append(trueLabel).append("\n");
 
+                // process the right operand if left operand is false
                 binaryExpression.getRight().accept(this);
                 code.append("    pop rbx\n");
 
+                // check if the right operand is true
                 code.append("    cmp rbx, 0\n");
                 code.append("    jne ").append(trueLabel).append("\n");
+
+                // return false if both operands are false
                 code.append("    mov rax, 0\n");
                 code.append("    jmp ").append(endLabel).append("\n");
 
+                // return true if one of the operands is true
                 code.append(trueLabel).append(":\n");
                 code.append("    mov rax, 1\n");
+
+                // end operation
                 code.append(endLabel).append(":\n");
                 break;
             default:
